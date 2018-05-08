@@ -97,6 +97,7 @@ alias robomongo='nohup /home/usr1/robomongo/bin/robomongo &'
 alias python=python3.6
 alias unity3d='nohup ~/Unity-2017.3.0b1/Editor/Unity &'
 alias frequent_command='/bin/bash /home/usr1/ScriptsBash/frequent_command.sh > /dev/pts/0'
+alias jupynote='nohup jupyter-notebook &'
 
 #SSH
 alias j1='ssh nsolignac@192.168.33.152'
@@ -124,6 +125,8 @@ alias mcapi='ssh nsolignac@192.168.33.172'
 alias aasterisk='ssh nsolignac@192.168.33.182'
 alias celco1='ssh nsolignac@192.168.33.134'
 alias celco2='ssh nsolignac@192.168.33.135'
+alias pso='ssh nsolignac@192.168.34.134'
+alias cmpcron='ssh nsolignac@192.168.33.148'
 
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert

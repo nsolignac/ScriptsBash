@@ -127,6 +127,7 @@ alias celco1='ssh nsolignac@192.168.33.134'
 alias celco2='ssh nsolignac@192.168.33.135'
 alias pso='ssh nsolignac@192.168.34.134'
 alias cmpcron='ssh nsolignac@192.168.33.148'
+alias j3='ssh nsolignac@192.168.33.115'
 
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert

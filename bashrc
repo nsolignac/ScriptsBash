@@ -98,8 +98,9 @@ alias python=python3.6
 alias unity3d='nohup ~/Unity-2017.3.0b1/Editor/Unity &'
 alias frequent_command='/bin/bash /home/usr1/ScriptsBash/frequent_command.sh > /dev/pts/0'
 alias jupynote='nohup jupyter-notebook &'
+alias eclipse='nohup /home/usr1/eclipse/committers-oxygen/eclipse/eclipse &'
 
-#SSH
+# SSH PROD
 alias j1='ssh nsolignac@192.168.33.152'
 alias j2='ssh nsolignac@192.168.33.159'
 alias dap='ssh soporte@192.168.33.147'
@@ -117,10 +118,6 @@ alias f23='ssh nsolignac@192.168.9.105'
 alias f24='ssh nsolignac@192.168.9.62'
 alias vls='ssh nsolignac@192.168.9.92'
 alias p4='ssh nsolignac@192.168.34.102'
-alias qaw='ssh root@192.168.10.29'
-alias qadbs='ssh root@192.168.10.87'
-alias qaprocs='ssh root@192.168.10.28'
-alias qasterisk='ssh root@192.168.10.110'
 alias mcapi='ssh nsolignac@192.168.33.172'
 alias aasterisk='ssh nsolignac@192.168.33.182'
 alias celco1='ssh nsolignac@192.168.33.134'
@@ -128,6 +125,23 @@ alias celco2='ssh nsolignac@192.168.33.135'
 alias pso='ssh nsolignac@192.168.34.134'
 alias cmpcron='ssh nsolignac@192.168.33.148'
 alias j3='ssh nsolignac@192.168.33.115'
+
+# SSH QA OLD
+alias qasterisk='ssh root@192.168.10.110'
+alias qaprocs='ssh root@192.168.10.28'
+alias qadbs='ssh root@192.168.10.87'
+alias qaw='ssh root@192.168.10.29'
+
+# SSH QA
+alias wsaqa='ssh appuser@192.168.20.109' #WSAdapter - ServicioCelco
+alias waqa='ssh appuser@192.168.20.108' #WebAdapter - Adapter
+alias wqa='ssh appuser@192.168.20.105' #Web
+alias procqa='ssh appuser@192.168.20.110' #ProcFTP - ProcCreditos - ProcCampanaSMS - ProcCampanaAudio
+alias reporqa='ssh appuser@192.168.20.113' #ProcReportes
+alias f2wqa='ssh appuser@192.168.20.114' #Frontera2 Web
+alias monqa='ssh appuser@192.168.20.111' #MongoDB
+alias sqlqa='ssh appuser@192.168.20.106' #Frontera2 SQL - CMP SQL
+alias amqqa='ssh appuser@192.168.20.112' #ActiveMQ
 
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert

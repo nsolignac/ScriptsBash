@@ -10,6 +10,8 @@ read DEVICE
 
 umount $DEVICE
 
+#TODO add a case for different types of format.
+
 #To format as FAT32:
 
 mkdosfs -F 32 -I $DEVICE 

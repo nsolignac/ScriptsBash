@@ -112,7 +112,6 @@ alias p2='ssh nsolignac@192.168.9.178'
 alias p3='ssh nsolignac@192.168.33.161'
 alias cmpw='ssh nsolignac@192.168.35.112'
 alias hedw='ssh nsolignac@192.168.33.178'
-alias f21='ssh nsolignac@192.168.9.34'
 alias f22='ssh nsolignac@192.168.9.196'
 alias f23='ssh nsolignac@192.168.9.105'
 alias f24='ssh nsolignac@192.168.9.62'
@@ -137,11 +136,12 @@ alias wsaqa='ssh appuser@192.168.20.109' #WSAdapter - ServicioCelco
 alias waqa='ssh appuser@192.168.20.108' #WebAdapter - Adapter
 alias wqa='ssh appuser@192.168.20.105' #Web
 alias procqa='ssh appuser@192.168.20.110' #ProcFTP - ProcCreditos - ProcCampanaSMS - ProcCampanaAudio
-alias reporqa='ssh appuser@192.168.20.113' #ProcReportes
+alias testqa='ssh appuser@192.168.20.113' #Servidor Test de QA
 alias f2wqa='ssh appuser@192.168.20.114' #Frontera2 Web
 alias monqa='ssh appuser@192.168.20.111' #MongoDB
 alias sqlqa='ssh appuser@192.168.20.106' #Frontera2 SQL - CMP SQL
 alias amqqa='ssh appuser@192.168.20.112' #ActiveMQ
+alias salesqa='ssh nsolignac@192.168.20.104' #Sales QA
 
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert

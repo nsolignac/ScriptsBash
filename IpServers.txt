@@ -1,0 +1,157 @@
+============
+Server's IP:
+============
+
+- Dynform2.0 (API, Web, LaravelCron??)
+  	192.168.34.108
+
+- ASTERISK
+ - Axion Energy SA
+   192.168.9.131
+
+- Multichannel Telecom
+	200.61.208.140
+
+- Hedwig (Qubit)
+- hedwig
+- hedwig-Cobros
+- hedwg-CommandProcesor
+- hedwig-commons
+- hedwig-RenewalTool
+  	192.168.33.178
+
+
+
+- Hermes
+- PSO
+- MessageSender
+- WsClient
+	192.168.34.134
+
+- Dynform 2.0 (API, Web, DB, Cron)
+  192.168.34.108
+
+- Multichannel Telecom (API, Web, Widget, DB)
+	200.61.208.140
+
+
+- Multichannel (API)
+	192.168.33.172
+
+
+- Redmines Vicente Lopez
+	192.168.34.140
+
+
+- Redmine Vicente Lopez - Visados
+	192.168.34.141
+
+
+- Multichannel (web)
+- Dynform vlopezweb
+- Dynform vlopezapi
+- CMP Web
+	192.168.35.112 - cmpw
+
+
+- Vlopez Scripts
+	192.168.9.92 - vls
+
+
+- Redmine Vlopez Testing
+	192.168.10.17
+
+
+- PSM
+	lnx110 - 192.168.9.181 - p1
+	lnx16 - 192.168.9.178 - p2
+	lprosones04 - 192.168.33.161 - p3
+	lpronexes01 - 192.168.34.102 - p4
+
+
+- CMP Reportes
+	192.168.33.146 - report
+
+
+- Servidores SMPP
+	192.168.33.152 - j1
+	192.168.33.159 - j2
+
+- Balancer fronterad2
+	192.168.33.80
+
+
+- Worker frontera2 (CON balancer)
+	192.168.9.196 - f22
+	192.168.9.105 - f23
+	192.168.9.62 - f24
+
+
+- BB2 - Zabbix
+	192.168.9.84 - bb2
+
+
+- Procesadores
+	192.168.33.154 - procs
+
+
+- Adapter (Produ)
+	192.168.33.147 - dap
+
+- Galera Reportes (DB)
+  192.168.33.80
+
+- Procesador de Alertas (Axion)
+  192.168.33.09
+
+- Java (AsteriskService) IVR Veraz
+  192.168.34.136
+
+- Axion QA - ASTERISK
+  192.168.20.103
+
+- Axion QA Web
+  192.168.10.29
+
+- Asterisk CMP
+   9.131 - Asterisk (AGI Entrante) - 13.14.1
+  33.142 - Asterisk - 13.14.1
+  33.157 - Asterisk - 13.14.1
+  33.158 - Asterisk - 13.14.1
+  33.175 - Asterisk - 13.14.1
+  33.176 - Asterisk - 13.14.1
+  33.177 - Asterisk - 13.14.1
+  33.179 - Asterisk - 13.14.1::
+  33.182 - Asterisk (AGI Saliente) - 13.18-cert3
+  33.180 - Asterisk - 13.14.1
+  33.162 - Asterisk - 11.13.1
+
+- Multichannel (Cloud Servers Telecom)
+  200.61.208.140
+
+- frontera2 QA
+  192.168.10.87
+
+- Scripts
+  192.168.9.92
+
+- Scripts Old
+  192.168.9.160
+
+- Lyric
+  192.168.33.173
+
+- FSales Prod
+  192.168.9.53
+
+- Multichannel QA
+  192.168.20.101
+
+- frontera 1
+  192.168.9.43 - lnx22
+  192.168.9.40 - lnx25
+
+
+- WebServiceAdapter
+  192.168.33.134 - Nodo1
+  192.168.33.135 - Nodo2

@@ -7,7 +7,9 @@ var match = {
 /* group pipeline */
 group = {
     $group: { 
-        _id : "$idUsuario" 
+        _id : "$idUsuario",
+        totalMinutos: { 
+                              $sum: "$duracion" }
     }
 };
 

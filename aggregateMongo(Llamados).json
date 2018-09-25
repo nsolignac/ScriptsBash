@@ -1,0 +1,14 @@
+/* match pipeline */
+var match = {
+    $match: {
+        "fechaLlamado": { "$gte" : ISODate("2018-08-01T00:00:00.000Z"),
+        		  "$lte" : ISODate("2018-08-31T15:59:59.000Z")}}
+},
+/* group pipeline */
+group = {
+    $group: { 
+        _id : "$idUsuario" 
+    }
+};
+
+db.getCollection('Llamados').aggregate([match, group]);

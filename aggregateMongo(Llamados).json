@@ -6,10 +6,10 @@ var match = {
 },
 /* group pipeline */
 group = {
-    $group: { 
+    $group: {
+        idCamp : { $addToSet : "$idCampania"}, 
         _id : "$idUsuario",
-        totalMinutos: { 
-                              $sum: "$duracion" }
+        totalMinutos: { $sum: "$duracion" },
     }
 };
 

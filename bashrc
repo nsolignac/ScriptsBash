@@ -91,6 +91,8 @@ fi
 alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
+
+# User defined aliases
 alias navicat='nohup wine .wine/drive_c/Program\ Files/PremiumSoft/Navicat\ Premium/navicat.exe &'
 alias pycharm='nohup sh /home/usr1/Descargas/pycharm-community-2017.2.4/bin/pycharm.sh &'
 alias robomongo='nohup /home/usr1/robomongo/bin/robomongo &'
@@ -99,6 +101,9 @@ alias unity3d='nohup ~/Unity-2017.3.0b1/Editor/Unity &'
 alias frequent_command='/bin/bash /home/usr1/ScriptsBash/frequent_command.sh > /dev/pts/0'
 alias jupynote='nohup jupyter-notebook &'
 alias eclipse='nohup /home/usr1/eclipse/committers-oxygen/eclipse/eclipse &'
+alias museScore='nohup /home/usr1/Downloads/MuseScore &'
+alias androidStudio='/bin/bash /home/usr1/android-studio/bin/studio.sh &'
+alias loopBack='nohup ffmpeg -f x11grab -r 15 -s 1280x720 -i :0.0+0,0 -vcodec rawvideo -pix_fmt yuv420p -threads 0 -f v4l2 /dev/video0 &'
 
 # SSH PROD
 alias j1='ssh nsolignac@192.168.33.152'

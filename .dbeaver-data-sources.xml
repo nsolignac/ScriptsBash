@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data-sources>
+	<data-source id="mysql5-15f02bb4215-6d0d5c0f9e682699" provider="mysql" driver="mysql5" name="CMP - 34.114" save-password="true" show-system-objects="true" read-only="false">
+		<connection host="192.168.34.114" port="3306" server="" database="" url="jdbc:mysql://192.168.34.114:3306/" user="soporte" password="IAsWL1NXQVhWQ1Vrd/c=" home="/usr" type="prod">
+			<property name="connectTimeout" value="20000"/>
+			<network-handler type="TUNNEL" id="ssh_tunnel" enabled="false" save-password="false">
+				<property name="sshConnectTimeout" value="10000"/>
+				<property name="port" value="22"/>
+				<property name="authType" value="PASSWORD"/>
+			</network-handler>
+			<network-handler type="PROXY" id="socks_proxy" enabled="false" save-password="false">
+				<property name="socks-port" value="1080"/>
+			</network-handler>
+			<network-handler type="CONFIG" id="mysql_ssl" enabled="false" save-password="false">
+				<property name="ssl.public.key.retrieve" value="false"/>
+				<property name="ssl.verify.server" value="true"/>
+				<property name="ssl.require" value="false"/>
+			</network-handler>
+		</connection>
+		<virtual-meta-data>
+			<container name="model">
+				<container name="cmp">
+					<entity name="migrations">
+						<constraint name="PRIMARY" type="VIRTUAL KEY">
+							<attribute name="migration"/>
+							<attribute name="batch"/>
+						</constraint>
+					</entity>
+				</container>
+			</container>
+		</virtual-meta-data>
+	</data-source>
+	<data-source id="mysql5-15f02c272cc-12870cd5dde63e96" provider="mysql" driver="mysql5" name="Lnx14 - 9.159" save-password="true" show-system-objects="true" read-only="false">
+		<connection host="192.168.9.159" port="3306" server="" database="" url="jdbc:mysql://192.168.9.159:3306/" user="soporte" password="IAsWL1NXQVhWQ1Vrd/c=" home="/usr" type="prod">
+			<property name="connectTimeout" value="20000"/>
+			<network-handler type="CONFIG" id="mysql_ssl" enabled="false" save-password="false">
+				<property name="ssl.public.key.retrieve" value="false"/>
+				<property name="ssl.verify.server" value="true"/>
+				<property name="ssl.require" value="false"/>
+			</network-handler>
+			<network-handler type="PROXY" id="socks_proxy" enabled="false" save-password="false">
+				<property name="socks-port" value="1080"/>
+			</network-handler>
+			<network-handler type="TUNNEL" id="ssh_tunnel" enabled="false" save-password="false">
+				<property name="sshConnectTimeout" value="10000"/>
+				<property name="port" value="22"/>
+				<property name="authType" value="PASSWORD"/>
+			</network-handler>
+		</connection>
+	</data-source>
+	<data-source id="mariaDB-15f064f6465-75e0bf908f420027" provider="mysql" driver="mariaDB" name="Galera Reportes - 33.80" save-password="true" show-system-objects="true" read-only="false">
+		<connection host="192.168.33.80" port="3306" server="" database="" url="jdbc:mysql://192.168.33.80:3306/" user="soporte" password="IAsWL1NXQVhWQ1Vrd/c=" type="prod">
+			<network-handler type="CONFIG" id="mysql_ssl" enabled="false" save-password="false">
+				<property name="ssl.public.key.retrieve" value="false"/>
+				<property name="ssl.verify.server" value="true"/>
+				<property name="ssl.require" value="false"/>
+			</network-handler>
+			<network-handler type="TUNNEL" id="ssh_tunnel" enabled="false" save-password="false">
+				<property name="sshConnectTimeout" value="10000"/>
+				<property name="port" value="22"/>
+				<property name="authType" value="PASSWORD"/>
+			</network-handler>
+			<network-handler type="PROXY" id="socks_proxy" enabled="false" save-password="false">
+				<property name="socks-port" value="1080"/>
+			</network-handler>
+		</connection>
+	</data-source>
+	<data-source id="mysql5-15f2feb19d6-2fe4338bd985ab96" provider="mysql" driver="mysql5" name="Development Testing - 10.87" save-password="true" show-system-objects="true" read-only="false">
+		<connection host="192.168.10.87" port="3306" server="" database="" url="jdbc:mysql://192.168.10.87:3306/" user="root" password="QFZXMERTQUVXQ2bf" home="/usr" type="test">
+			<network-handler type="CONFIG" id="mysql_ssl" enabled="false" save-password="false">
+				<property name="ssl.public.key.retrieve" value="false"/>
+				<property name="ssl.verify.server" value="true"/>
+				<property name="ssl.require" value="false"/>
+			</network-handler>
+			<network-handler type="TUNNEL" id="ssh_tunnel" enabled="false" save-password="false">
+				<property name="sshConnectTimeout" value="10000"/>
+				<property name="port" value="22"/>
+				<property name="authType" value="PASSWORD"/>
+			</network-handler>
+			<network-handler type="PROXY" id="socks_proxy" enabled="false" save-password="false">
+				<property name="socks-port" value="1080"/>
+			</network-handler>
+		</connection>
+		<virtual-meta-data>
+			<container name="model">
+				<container name="cmp_prepro">
+					<entity name="portabilidad">
+						<constraint name="PRIMARY" type="VIRTUAL KEY">
+							<attribute name="sourceAddress"/>
+							<attribute name="lastCommit"/>
+							<attribute name="celco"/>
+						</constraint>
+					</entity>
+				</container>
+			</container>
+		</virtual-meta-data>
+	</data-source>
+	<data-source id="mariaDB-160504cde0a-7ad468bf160fcab" provider="mysql" driver="mariaDB" name="Lnx92 - 9.163" save-password="true" show-system-objects="true" read-only="false">
+		<connection host="192.168.9.163" port="3306" server="" database="" url="jdbc:mysql://192.168.9.163:3306/" user="root" password="QlZVdBQVVBMVF1dsRHak" home="/usr" type="prod">
+			<network-handler type="TUNNEL" id="ssh_tunnel" enabled="false" save-password="false">
+				<property name="sshConnectTimeout" value="10000"/>
+				<property name="port" value="22"/>
+				<property name="authType" value="PASSWORD"/>
+			</network-handler>
+			<network-handler type="PROXY" id="socks_proxy" enabled="false" save-password="false">
+				<property name="socks-port" value="1080"/>
+			</network-handler>
+			<network-handler type="CONFIG" id="mysql_ssl" enabled="false" save-password="false">
+				<property name="ssl.public.key.retrieve" value="false"/>
+				<property name="ssl.verify.server" value="true"/>
+				<property name="ssl.require" value="false"/>
+			</network-handler>
+		</connection>
+	</data-source>
+	<data-source id="mysql5-1629bc02ebf-54c6ce744495e0df" provider="mysql" driver="mysql5" name="AXION - 192.168.33.80" save-password="true" show-system-objects="true" read-only="false">
+		<connection host="192.168.33.80" port="3306" server="" database="" url="jdbc:mysql://192.168.33.80:3306/" user="axionuser" password="EhwPL08NFUJl8w==" home="/usr" type="prod">
+			<network-handler type="TUNNEL" id="ssh_tunnel" enabled="false" save-password="false">
+				<property name="sshConnectTimeout" value="10000"/>
+				<property name="port" value="22"/>
+				<property name="implementation" value="jsch"/>
+				<property name="authType" value="PASSWORD"/>
+			</network-handler>
+			<network-handler type="CONFIG" id="mysql_ssl" enabled="false" save-password="false">
+				<property name="ssl.public.key.retrieve" value="false"/>
+				<property name="ssl.verify.server" value="true"/>
+				<property name="ssl.require" value="false"/>
+			</network-handler>
+			<network-handler type="PROXY" id="socks_proxy" enabled="false" save-password="false">
+				<property name="socks-port" value="1080"/>
+			</network-handler>
+			<bootstrap autocommit="false"/>
+		</connection>
+	</data-source>
+	<data-source id="mysql5-162b14bbb08-22310be9cfd23a1" provider="mysql" driver="mysql5" name="Veraz HA - 34.118" save-password="true" show-system-objects="true" read-only="false">
+		<connection host="192.168.34.118" port="3306" server="" database="" url="jdbc:mysql://192.168.34.118:3306/" user="soporte" password="IAsWL1NXQVhWQ1Vrd/c=" home="/usr" type="prod">
+			<network-handler type="CONFIG" id="mysql_ssl" enabled="false" save-password="false">
+				<property name="ssl.public.key.retrieve" value="false"/>
+				<property name="ssl.verify.server" value="true"/>
+				<property name="ssl.require" value="false"/>
+			</network-handler>
+			<network-handler type="TUNNEL" id="ssh_tunnel" enabled="false" save-password="false">
+				<property name="sshConnectTimeout" value="10000"/>
+				<property name="port" value="22"/>
+				<property name="implementation" value="jsch"/>
+				<property name="authType" value="PASSWORD"/>
+			</network-handler>
+			<network-handler type="PROXY" id="socks_proxy" enabled="false" save-password="false">
+				<property name="socks-port" value="1080"/>
+			</network-handler>
+			<bootstrap autocommit="false"/>
+		</connection>
+	</data-source>
+	<data-source id="mariaDB-163263caefd-221b1e00448ca841" provider="mysql" driver="mariaDB" name="Dynform2" save-password="true" show-system-objects="true" read-only="false">
+		<connection host="192.168.34.108" port="3306" server="" database="dynform2" url="jdbc:mysql://192.168.34.108:3306/dynform2" user="dynform2" password="Fx0IJk5RSURLQVdtQnak" home="/usr" type="prod">
+			<network-handler type="CONFIG" id="mysql_ssl" enabled="false" save-password="false">
+				<property name="ssl.public.key.retrieve" value="false"/>
+				<property name="ssl.verify.server" value="true"/>
+				<property name="ssl.require" value="false"/>
+			</network-handler>
+			<network-handler type="TUNNEL" id="ssh_tunnel" enabled="false" save-password="false">
+				<property name="sshConnectTimeout" value="10000"/>
+				<property name="port" value="22"/>
+				<property name="implementation" value="jsch"/>
+				<property name="authType" value="PASSWORD"/>
+			</network-handler>
+			<network-handler type="PROXY" id="socks_proxy" enabled="false" save-password="false">
+				<property name="socks-port" value="1080"/>
+			</network-handler>
+			<bootstrap autocommit="false"/>
+		</connection>
+	</data-source>
+	<data-source id="mysql5-16327afa967-30a2bb49777e52ed" provider="mysql" driver="mysql5" name="DTV Auditorias -  192.168.9.27" save-password="true" show-system-objects="true" read-only="false">
+		<connection host="192.168.9.27" port="3306" server="" database="" url="jdbc:mysql://192.168.9.27:3306/" user="soporte" password="IAsWL1NXQVhWQ1Vrd/c=" home="/usr" type="prod">
+			<network-handler type="CONFIG" id="mysql_ssl" enabled="false" save-password="false">
+				<property name="ssl.public.key.retrieve" value="false"/>
+				<property name="ssl.verify.server" value="true"/>
+				<property name="ssl.require" value="false"/>
+			</network-handler>
+			<network-handler type="PROXY" id="socks_proxy" enabled="false" save-password="false">
+				<property name="socks-port" value="1080"/>
+			</network-handler>
+			<network-handler type="TUNNEL" id="ssh_tunnel" enabled="false" save-password="false">
+				<property name="sshConnectTimeout" value="10000"/>
+				<property name="port" value="22"/>
+				<property name="implementation" value="jsch"/>
+				<property name="authType" value="PASSWORD"/>
+			</network-handler>
+			<bootstrap autocommit="false"/>
+		</connection>
+	</data-source>
+	<data-source id="mysql5-163f5715513-3be803cad704280f" provider="mysql" driver="mysql5" name="QA - 20.106" save-password="true" show-system-objects="true" read-only="false">
+		<connection host="192.168.20.106" port="3306" server="" database="cmpqa" url="jdbc:mysql://192.168.20.106:3306/cmpqa" user="cmpqa" password="EAkWMUAQFUVQcuc=" home="/usr" type="test">
+			<network-handler type="CONFIG" id="mysql_ssl" enabled="false" save-password="false">
+				<property name="ssl.public.key.retrieve" value="false"/>
+				<property name="ssl.verify.server" value="true"/>
+				<property name="ssl.require" value="false"/>
+			</network-handler>
+			<network-handler type="PROXY" id="socks_proxy" enabled="false" save-password="false">
+				<property name="socks-port" value="1080"/>
+			</network-handler>
+			<network-handler type="TUNNEL" id="ssh_tunnel" enabled="false" save-password="false">
+				<property name="sshConnectTimeout" value="10000"/>
+				<property name="port" value="22"/>
+				<property name="implementation" value="jsch"/>
+				<property name="authType" value="PASSWORD"/>
+			</network-handler>
+		</connection>
+	</data-source>
+	<data-source id="mariaDB-165cfada1c7-5d10b6865b9c7998" provider="mysql" driver="mariaDB" name="MariaDB - 192.168.10.9" save-password="true" show-system-objects="true" read-only="false">
+		<connection host="192.168.10.9" port="3306" server="" database="" url="jdbc:mysql://192.168.10.9:3306/" user="root" password="QFZXMERTQUVXQ2bf" home="/usr" type="dev">
+			<network-handler type="PROXY" id="socks_proxy" enabled="false" save-password="false">
+				<property name="socks-port" value="1080"/>
+			</network-handler>
+			<network-handler type="CONFIG" id="mysql_ssl" enabled="false" save-password="false">
+				<property name="ssl.public.key.retrieve" value="false"/>
+				<property name="ssl.verify.server" value="true"/>
+				<property name="ssl.require" value="false"/>
+			</network-handler>
+			<network-handler type="TUNNEL" id="ssh_tunnel" enabled="false" save-password="false">
+				<property name="sshConnectTimeout" value="10000"/>
+				<property name="port" value="22"/>
+				<property name="implementation" value="jsch"/>
+				<property name="authType" value="PASSWORD"/>
+			</network-handler>
+		</connection>
+	</data-source>
+	<data-source id="mysql5-1661cbb2e71-26d2901c055525fc" provider="mysql" driver="mysql5" name="CMP QA - 20.106" save-password="true" show-system-objects="true" read-only="false">
+		<connection host="192.168.20.106" port="3306" server="" database="cmpqa" url="jdbc:mysql://192.168.20.106:3306/cmpqa" user="cmpqa" password="EAkWMUAQFUVQcuc=" home="/usr" type="test">
+			<property name="connectTimeout" value="20000"/>
+			<network-handler type="PROXY" id="socks_proxy" enabled="false" save-password="false">
+				<property name="socks-port" value="1080"/>
+			</network-handler>
+			<network-handler type="CONFIG" id="mysql_ssl" enabled="false" save-password="false">
+				<property name="ssl.public.key.retrieve" value="false"/>
+				<property name="ssl.verify.server" value="true"/>
+				<property name="ssl.require" value="false"/>
+			</network-handler>
+			<network-handler type="TUNNEL" id="ssh_tunnel" enabled="false" save-password="false">
+				<property name="sshConnectTimeout" value="10000"/>
+				<property name="port" value="22"/>
+				<property name="implementation" value="jsch"/>
+				<property name="authType" value="PASSWORD"/>
+			</network-handler>
+		</connection>
+	</data-source>
+	<filters/>
+</data-sources>

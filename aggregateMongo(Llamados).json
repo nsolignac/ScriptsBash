@@ -9,7 +9,7 @@ group = {
     $group: {
         idCamp : { $addToSet : "$idCampania"}, 
         _id : "$idUsuario",
-        totalMinutos: { $sum: "$duracion" },
+        totalSegundos: { $sum: "$duracion" },
     }
 };
 

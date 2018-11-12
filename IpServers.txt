@@ -155,3 +155,6 @@ Server's IP:
 - WebServiceAdapter
   192.168.33.134 - Nodo1
   192.168.33.135 - Nodo2
+  
+  - Virtualizadores Android
+    192.168.35.111 - Tandem, Argenpesos

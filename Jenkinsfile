@@ -14,7 +14,7 @@ pipeline {
         }
         stage ('Deploy a QA'){
             steps {
-              build job:
+              build job: 'servicios-cmp-backend (Deploy-to-staging)'
             }
         }
     }

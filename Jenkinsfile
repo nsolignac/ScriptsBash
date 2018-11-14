@@ -1,26 +1,42 @@
 pipeline {
     agent any
     stages{
-        stage('Build') {
+        stage('Build'){
             steps {
                 sh 'mvn clean package'
             }
             post {
                 success {
-                    echo 'Ahora Archivando'
-                      archiveArtifacts artifacts: '**/target/*.jar'
+                    echo 'Now Archiving...'
+                    archiveArtifacts artifacts: '**/target/*.war'
                 }
             }
         }
-        stage ('Deploy a QA') {
-            when {
-              expression {
-                currentBuild.result == null || currentBuild.result == 'SUCCESS'
-              }
-            }
+        stage ('Deploy to PRE'){
             steps {
-                build job: 'servicios-cmp-backend (Deploy-to-staging)'
+                build job: 'Deploy-to-staging'
             }
         }
+
+        stage ('Deploy to QA'){
+            steps{
+                timeout(time:5, unit:'DAYS'){
+                    input message:'Approve QA Deployment?', submitter: "admin"
+                }
+
+                build job: 'Deploy-to-Prod'
+            }
+            post {
+                success {
+                    echo 'Code deployed to Production.'
+                }
+
+                failure {
+                    echo ' Deployment failed.'
+                }
+            }
+        }
+
+
     }
 }

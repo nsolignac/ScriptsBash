@@ -1,7 +1,7 @@
 pipeline {
     agent any
     stages{
-        stage('Build'){
+        stage('Build') {
             steps {
                 sh 'mvn clean package'
             }
@@ -12,9 +12,14 @@ pipeline {
                 }
             }
         }
-        stage ('Deploy a QA'){
+        stage ('Deploy a QA') {
+            when {
+              expression {
+                currentBuild.result == null || currentBuild.result == 'SUCCESS'
+              }
+            }
             steps {
-              build job: 'servicios-cmp-backend (Deploy-to-staging)'
+                build job: 'servicios-cmp-backend (Deploy-to-staging)'
             }
         }
     }

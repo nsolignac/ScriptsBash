@@ -2,15 +2,15 @@
 rm *.jar_*
 
 #  RHEL / CentOS 7.x httpd restart command
-RESTART = "/bin/systemctl restart cmp-servicios-api"
+RESTART="/bin/systemctl restart cmp-servicios-api"
 
 #Path to pgrep command
-PGREP = "/usr/bin/pgrep"
+PGREP="/usr/bin/pgrep"
 
-CMP-API = "servicios_cmp_backend.jar"
+API="dbeaver"
 
 # Find process pid
-$PGREP ${CMP-API}
+$PGREP ${API}
 
 if [ $? -ne 0 ] #If process not running
 then

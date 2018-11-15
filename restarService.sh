@@ -7,7 +7,7 @@ RESTART="/bin/systemctl restart cmp-servicios-api"
 #Path to pgrep command
 PGREP="/usr/bin/pgrep"
 
-API="dbeaver"
+API="cups"
 
 # Find process pid
 $PGREP ${API}

@@ -3,8 +3,8 @@ adb devices
 
 # Mapea variable con nombre del dispositivo
 echo "Indique el dispositivo: "
-echo "Defaults ID's : emulator-5554 (Tandem)"
-echo "Defaults ID's : emulator-5556 (Argenpesos)"
+echo "Default ID : emulator-5554 (Tandem)"
+echo "Default ID : emulator-5556 (Argenpesos)"
 read DEVICE
 
 # Mapea variable con nombre de la app
@@ -23,4 +23,10 @@ adb -s $DEVICE shell dumpsys window windows | grep -E 'mCurrentFocus'
 # {com.package.name.ActivityName}="com.whatsapp.HomeActivity"
 
 # Ejecuta Activity de una app
-am start -n com.package.name/com.package.name.ActivityName
+adb -s $DEVICE shell am start -n com.package.name/com.package.name.ActivityName
+
+# Espera por la response del equipo
+sleep 7
+
+# KeyEvent Home de Android para enviar WhatsApp de nuevo al background
+adb -s $DEVICE shell input keyevent 3 # "KEYCODE_HOME"

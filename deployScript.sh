@@ -4,13 +4,13 @@
 # https://wiki.jenkins.io/display/JENKINS/Jenkins+SSH
 
 
-
-# https://shapeshed.com/unix-cut/
-#Store file name for further use
 # TODO: make the word to search in 'grep' as a var as:
 # echo "Tell me the name..."
 # read WORD
 # FILENAME=ls . | grep "$WORD" | cut -d '.' -f 1
+
+# https://shapeshed.com/unix-cut/
+#Store file name for further use
 FILENAME=ls . | grep "asd" | cut -d '.' -f 1
 
 #ROOT folder cleaning

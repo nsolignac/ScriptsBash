@@ -1,10 +1,14 @@
 # Se guarda el valor de $DEVICE
-echo "Indique el dispositivo incluyendo guion y numero: "
-read DEVICE
+#echo "Indique el dispositivo incluyendo guion y numero: "
+#read DEVICE
 
 # Directorio donde se desea loguear
 LOGDIR=/home/$USER
-LOGDIR+='/'
+LOGDIR+='/$FOLDER'
+
+# Carpeta donde se desea loguear
+echo "Indique la carpeta donde desea loguear: "
+read FOLDER
 
 # Archivo de log
 logWhats=logWhatsapp.txt

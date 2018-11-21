@@ -11,21 +11,31 @@
 
 # https://shapeshed.com/unix-cut/
 #Store file name for further use
-FILENAME=ls . | grep "asd" | cut -d '.' -f 1
+FILENAME=$(ls . | grep "asd" | cut -d '.' -f 1 | sort -u)
+
+#Define root dir of the project
+ROOTDIR="/home/$USER/testROOT"
 
 #ROOT folder cleaning
-cd /appuser/multichannel/ | rm *.jar_* | mv *.jar ${FILENAME}.jar_$(date +%d-%m-%Y)
+cd $ROOTDIR
+
+rm *.jar_* | mv *.jar ${FILENAME}.jar_$(date +%d-%m-%Y)
+
+# DEPLOY
+touch $FILENAME.jar
 
 #Artifact perms
-chown --reference *.jar_$(date +%d-%m-%Y) *.jar && chmod --reference *.jar_$(date +%d-%m-%Y) *.jar
+chown --reference *.jar_$(date +%d-%m-%Y) $FILENAME.jar
+chmod --reference *.jar_$(date +%d-%m-%Y) $FILENAME.jar
+
+# API var
+API="$FILENAME.service"
 
 #  RHEL / CentOS 7.x httpd restart command
 RESTART="/bin/systemctl restart $API"
 
 #Path to pgrep command
 PGREP="/usr/bin/pgrep"
-
-API="cups"
 
 # Find process pid
 $PGREP ${API}

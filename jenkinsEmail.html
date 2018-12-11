@@ -1,0 +1,69 @@
+<STYLE>
+BODY, TABLE, TD, TH, P {
+  font-family:Verdana,Helvetica,sans serif;
+  font-size:11px;
+  color:black;
+}
+
+</STYLE>
+<BODY>
+<%
+float versionadjust = 103.0f
+float newversion = (build.number + 103) / 1000
+def realVersion = newversion.round(3)
+%>
+<TABLE>
+  <TR><TD align="right"><IMG SRC="${rooturl}static/e59dfe28/images/32x32/<%= build.result.toString() == 'SUCCESS' ? "blue.gif" : build.result.toString() == 'FAILURE' ? 'red.gif' : 'yellow.gif' %>" />
+  </TD><TD valign="center"><B style="font-size: 200%;">BUILD ${build.result}</B></TD></TR>
+  <TR><TD>Build URL</TD><TD><A href="${rooturl}${build.url}">${rooturl}${build.url}</A></TD></TR>
+  <TR><TD>Project:</TD><TD>${project.name}</TD></TR>
+  <TR><TD>Project version:</TD><TD>${realVersion}</TD></TR>
+  <TR><TD>Date of build:</TD><TD>${it.timestampString}</TD></TR>
+  <TR><TD>Build duration:</TD><TD>${build.durationString}</TD></TR>
+</TABLE>
+<BR/>
+
+<!-- CHANGE SET -->
+<%
+def changeSet = build.changeSet
+if(changeSet != null) {
+    def hadChanges = false %>
+    <TABLE width="100%">
+    <TR><TD class="bg1" colspan="2"><B>CHANGES</B></TD></TR>
+<%  changeSet.each() { cs ->
+        hadChanges = true %>
+      <TR>
+        <TD colspan="2" class="bg2">&nbsp;&nbsp;Revision <B><%= cs.metaClass.hasProperty('commitId') ? cs.commitId : cs.metaClass.hasProperty('revision') ? cs.revision :
+        cs.metaClass.hasProperty('changeNumber') ? cs.changeNumber : "" %></B> by
+          <B><%= cs.author %>: </B>
+          <B>(${cs.msgAnnotated})</B>
+         </TD>
+      </TR>
+<%      cs.affectedFiles.each() { p -> %>
+        <TR>
+          <TD width="10%">&nbsp;&nbsp;${p.editType.name}</TD>
+          <TD>${p.path}</TD>
+        </TR>
+<%      }
+    }
+
+    if(!hadChanges) { %>
+        <TR><TD colspan="2">No Changes</TD></TR>
+<%  } %>
+  </TABLE>
+<BR/>
+<% } %>
+
+
+<!-- CONSOLE OUTPUT -->
+<% if(build.result==hudson.model.Result.FAILURE) { %>
+<TABLE width="100%" cellpadding="0" cellspacing="0">
+<TR><TD class="bg1"><B>CONSOLE OUTPUT</B></TD></TR>
+<%  build.getLog(100).each() { line -> %>
+    <TR><TD class="console">${org.apache.commons.lang.StringEscapeUtils.escapeHtml(line)}</TD></TR>
+<%  } %>
+</TABLE>
+<BR/>
+<% } %>
+
+</BODY>

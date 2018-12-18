@@ -22,3 +22,6 @@ Measuring programming progress by lines of code is like measuring aircraft build
  — Bill Gates
 
 --
+
+Avoid Yoda conditions and assignments within conditionals.
+(https://en.wikipedia.org/wiki/Yoda_conditions)

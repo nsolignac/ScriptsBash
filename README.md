@@ -2,7 +2,8 @@
 Backup de scripts en bash (entre otras cosas...)
 
 --
-
+        https://edgecoders.com/the-mistakes-i-made-as-a-beginner-programmer-ac8b3e54c312
+        
 When reviewing code, count to 10 before you refactor a line. If the code does not have tests, a hundred.
 — Samer Buna
 

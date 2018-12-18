@@ -91,6 +91,7 @@ fi
 alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
+alias starwars='telnet towel.blinkenlights.nl'
 
 # User defined aliases
 alias navicat='nohup wine .wine/drive_c/Program\ Files/PremiumSoft/Navicat\ Premium/navicat.exe &'

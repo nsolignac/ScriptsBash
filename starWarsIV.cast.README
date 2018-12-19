@@ -1,0 +1,18 @@
+Play with:
+asciinema play starWarsIV.cast
+
+For use in Web Browser:
+Download player from https://github.com/asciinema/asciinema-player/releases
+
+Then use use it this way:
+
+<html>
+<head>
+  <link rel="stylesheet" type="text/css" href="/asciinema-player.css" />
+</head>
+<body>
+  <asciinema-player src="/2116.cast" cols="79" rows="22"></asciinema-player>
+  ...
+  <script src="/asciinema-player.js"></script>
+</body>
+</html>

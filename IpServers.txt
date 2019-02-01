@@ -35,9 +35,12 @@ Server's IP:
 	200.61.208.140
 
 
-- Multichannel (API)
+- Multichannel Web (API)
 	192.168.33.172
-
+- Multichannel BR (API)
+  192.168.33.188
+- Multichannel Multic (API)
+  192.168.33.187
 
 - Redmines Vicente Lopez
 	192.168.34.140

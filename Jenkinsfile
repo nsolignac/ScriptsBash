@@ -1,17 +1,39 @@
 pipeline {
     agent none
-    parameters {
-        gitParameter name: 'GIT_TAG',
-                     type: 'PT_TAG',
-                     defaultValue: 'origin/master'
+    // Actulizamos el estado de la build en la herramienta SCM
+    post {
+        success {
+            updateGitlabCommitStatus name: 'build', state: 'success'
+        }
+
+        failure {
+            updateGitlabCommitStatus name: 'build', state: 'failed'
+
+        }
+
+        aborted {
+            updateGitlabCommitStatus name: 'build', state: 'canceled'
+
+        }
     }
 
     options {
-      gitLabConnection('GitLab Sondeos')
+        // Definimos la herramienta SCM a utilizar (Previamente configurada en el Admin del Master de Jenkins)
+        gitLabConnection('GitLab Sondeos')
+        // Desactivamos el Checkout default ya que puede causar que no tome los commits
+        skipDefaultCheckout(true)
     }
 
     triggers {
+        // Definimos que tipo de evento en la SCM desata la build del proyecto
         gitlab(triggerOnPush: true, triggerOnMergeRequest: true, branchFilterType: 'All')
+    }
+
+    parameters {
+        // Parametros de TAG en Git
+        gitParameter name: 'GIT_TAG',
+                     type: 'PT_TAG',
+                     defaultValue: 'origin/master'
     }
 
     stages{
@@ -23,10 +45,13 @@ pipeline {
                 }
             }
             steps {
+                // Checkout con los ultimos cambios (incluyendo los commits)
+                checkout scm
                 sh 'mvn install package -e -X -Dmaven.test.skip=true'
             }
             post {
                 success {
+                    // Guardamos los binarios en el agente Master
                     echo 'Archivando binarios...'
                     archiveArtifacts artifacts: '**/target/*.jar'
                 }
@@ -41,8 +66,11 @@ pipeline {
                 }
             }
             steps{
+                // Checkout con los ultimos cambios (incluyendo los commits)
+                checkout scm
                 sh "mvn -batch-mode -V -U -e checkstyle:checkstyle pmd:pmd findbugs:findbugs" //"sonar:sonar"
 
+                // Realizamos el analisis estatico del codigo
                 step([$class: 'hudson.plugins.checkstyle.CheckStylePublisher', pattern: '**/target/checkstyle-result.xml'])
                 step([$class: 'PmdPublisher', pattern: '**/target/pmd.xml'])
                 step([$class: 'FindBugsPublisher', pattern: '**/findbugsXml.xml'])
@@ -57,7 +85,10 @@ pipeline {
                     args '-v /jenkins/.m2:/jenkins/.m2'
                 }
             }
+
             steps{
+                // Checkout con los ultimos cambios (incluyendo los commits)
+                checkout scm
                 sh "mvn test"
 
                 step([$class: 'JUnitResultArchiver', testResults: '**/target/surefire-reports/*.xml', healthScaleFactor: 1.0])
@@ -70,9 +101,11 @@ pipeline {
                 stage ('Deploy en Desa'){
                     agent {label 'PREPRO - 70'}
                     steps {
-                        // TODO: https://stackoverflow.com/questions/15174194/jenkins-host-key-verification-failed
+                        // Checkout con los ultimos cambios (incluyendo los commits)
+                        checkout scm
                         echo "Se comienza el DEPLOY en "+"${env.NODE_NAME}"+'.'
 
+                        // Deploy script
                         sh '''
 
                         # Definimos la ruta de trabajo
@@ -103,85 +136,126 @@ pipeline {
                         # Control del servicio
                         echo "Reiniciando el servicio"
                         /usr/sbin/service $API stop || true
-                        sleep 1 && /usr/sbin/service $API start
+                        sleep 1
+                        /usr/sbin/service $API start
                         ps aux | grep -v grep | grep $FILENAME
 
                         '''
-
                         echo "Se finaliza el DEPLOY en "+"${env.NODE_NAME}"+'.'
                     }
                 }
 
                 stage ('Deploy en QA'){
                     agent {label 'QA - 110'}
-                    when {
-                        not {
-                            //tag "master"
-                            tag "${params.master}"
-                        }
-                    }
                     steps{
-                        echo "Checking out: ${params.GIT_TAG}"
+                        script {
+                            // Checkout utilizando el parametro que contiene el ID del TAG
+                            checkout([$class: 'GitSCM',
+                                      branches: [[name: "${params.GIT_TAG}"]],
+                                      doGenerateSubmoduleConfigurations: false,
+                                      extensions: [],
+                                      gitTool: 'Default',
+                                      submoduleCfg: [],
+                                    ])
+
+                            // Verificamos que la Build sea por un TAG
+                            def tag = sh(returnStdout: true, script: "git tag --contains | head -1").trim()
+                            if (tag) {
+                                echo "ES TAG"
+                                echo "Checking out: ${params.GIT_TAG}"
+                            }
+                            else {
+                                echo "NO ES TAG"
+                                echo "Se omite el Deploy"
+                            }
+                        }
 
                         timeout(time:5, unit:'DAYS'){
-                            input message:'Aprueba el Deploy en QA?', submitter: "admin"
+                            // Email de solicitud para continuar con el Deploy
+                            mail to: 'nicolas.solignac@sondeos.com.ar',
+                                from: 'YourFriendlyNeighbourJenkins',
+                                subject: "Se requiere aprovacion para: ${currentBuild.fullDisplayName}",
+                                body: "Se requiere aprovacion para proceder con el Deploy de ${currentBuild.fullDisplayName} en ${env.NODE_NAME}.\nAcceder al siguiente link: ${env.RUN_DISPLAY_URL}"
+                            // Pedimos al usuario encargado que valide el Deploy
+                            input message:'Aprueba el Deploy en QA?', submitter: "QA"
+                            // TODO: if (${env.BUILD_USER_EMAIL} == ?? ) {wathever}
+                            wrap([$class: 'BuildUser']) {
+                            echo "${env.BUILD_USER}"
+                            echo "${env.BUILD_USER_EMAIL}"
+                            }
+                            // Deploy
+                            echo "Se comienza el DEPLOY en "+"${env.NODE_NAME}"+'.'
+                            // DEPLOY SCRIPT
+                            /*sh '''
 
-                        checkout([$class: 'GitSCM',
-                                  branches: [[name: "${params.GIT_TAG}"]],
-                                  doGenerateSubmoduleConfigurations: false,
-                                  extensions: [],
-                                  gitTool: 'Default',
-                                  submoduleCfg: [],
-                                ])
+                            # Definimos la ruta de trabajo
+                            ROOTDIR="/usr/CMP/servicios_cmp_backend"
 
+                            # Limpiamos la carpeta de los binarios obsoletos
+                            cd $ROOTDIR
+                            rm *.jar_* || true
+
+                            # Guardamos el nombre del archivo de BACKUP
+                            FILENAME=servicios_cmp_backend.jar
+
+                            # Realizo el BACKUP
+                            cp ${FILENAME} ${FILENAME}_$(date +%d-%m-%Y) || true
+
+                            # DEPLOY
+                            echo "Se comienza con el DEPLOY"
+                            cp ${WORKSPACE}/target/*.jar $FILENAME && echo "Se realizo el DEPLOY"
+
+                            # Artifact perms
+                            echo "Actulizamos los permisos"
+                            chown --reference *.jar_$(date +%d-%m-%Y) $FILENAME
+                            chmod --reference *.jar_$(date +%d-%m-%Y) $FILENAME
+
+                            # Variable API
+                            API="servicios-cmp-backend"
+
+                            # Control del servicio
+                            echo "Reiniciando el servicio"
+                            /usr/sbin/service $API stop || true
+                            sleep 1
+                            /usr/sbin/service $API start
+                            ps aux | grep -v grep | grep $FILENAME
+
+                            '''*/
+                            echo "Se finaliza el DEPLOY en "+"${env.NODE_NAME}"+'.'
+
+                            // Validacion para el proceso de rollback
                             script {
                                 if (currentBuild.currentResult == 'SUCCESS') {
                                     echo "Se realizo el deploy de la version ${GIT_TAG}"
                                     echo "Resultado de la build: ${currentBuild.currentResult}"
                                 }
                                 else {
-                                    echo "Resultado de la build: ${currentBuild.currentResult}"
+                                    // Script rollback
+                                    echo "WARNING: Resultado de la build: ${currentBuild.currentResult}"
                                 }
                             }
                         }
-                        echo "Se comienza el DEPLOY en "+"${env.NODE_NAME}"+'.'
-                        /*
-                        sh '''
+                    }
 
-                        # Definimos la ruta de trabajo
-                        ROOTDIR="/usr/CMP/servicios_cmp_backend"
+                    // Email informando el resultado del Deploy en el ambiente
+                    post {
+                        success {
+                            echo 'Cambios implementados en '+"${env.NODE_NAME}"+'.'
 
-                        # Limpiamos la carpeta de los binarios obsoletos
-                        cd $ROOTDIR
-                        rm *.jar_* || true
+                            mail to: 'nicolas.solignac@sondeos.com.ar',
+                                from: 'YourFriendlyNeighbourJenkins',
+                                subject: "Pipeline Exitosa: ${currentBuild.fullDisplayName}",
+                                body: "Se concreto correctamente el deploy de ${env.BUILD_URL} en ${env.NODE_NAME}."
+                        }
 
-                        # Guardamos el nombre del archivo de BACKUP
-                        FILENAME=servicios_cmp_backend.jar
+                        failure {
+                            echo 'Deploy fallido en '+"${env.NODE_NAME}"+'.'
 
-                        # Realizo el BACKUP
-                        cp ${FILENAME} ${FILENAME}_$(date +%d-%m-%Y) || true
-
-                        # DEPLOY
-                        echo "Se comienza con el DEPLOY"
-                        cp ${WORKSPACE}/target/*.jar $FILENAME && echo "Se realizo el DEPLOY"
-
-                        # Artifact perms
-                        echo "Actulizamos los permisos"
-                        chown --reference *.jar_$(date +%d-%m-%Y) $FILENAME
-                        chmod --reference *.jar_$(date +%d-%m-%Y) $FILENAME
-
-                        # Variable API
-                        API="servicios-cmp-backend"
-
-                        # Control del servicio
-                        echo "Reiniciando el servicio"
-                        /usr/sbin/service $API stop || true
-                        sleep 1 && /usr/sbin/service $API start
-                        ps aux | grep -v grep | grep $FILENAME
-
-                        '''
-                        */
-                        echo "Se finaliza el DEPLOY en "+"${env.NODE_NAME}"+'.'
+                            mail to: 'nicolas.solignac@sondeos.com.ar',
+                                from: 'YourFriendlyNeighbourJenkins',
+                                subject: "Pipeline Fallida: ${currentBuild.fullDisplayName}",
+                                body: "Algo esta mal con ${env.BUILD_URL} en ${env.NODE_NAME}."
+                        }
                     }
                 }
             }
@@ -189,61 +263,75 @@ pipeline {
 
         stage ('Deploy to Production'){
             agent any
-            when {
-                not {
-                    // tag "master"
-                    tag "${params.master}"
-                }
-            }
             steps{
-                echo "Checking out: ${params.GIT_TAG}"
+                script {
+                    // Checkout utilizando el parametro que contiene el ID del TAG
+                    checkout([$class: 'GitSCM',
+                              branches: [[name: "${params.GIT_TAG}"]],
+                              doGenerateSubmoduleConfigurations: false,
+                              extensions: [],
+                              gitTool: 'Default',
+                              submoduleCfg: [],
+                            ])
+
+                    // Verificamos que la Build sea por un TAG
+                    def tag = sh(returnStdout: true, script: "git tag --contains | head -1").trim()
+                    if (tag) {
+                        echo "ES TAG"
+                        echo "Checking out: ${params.GIT_TAG}"
+                    }
+                    else {
+                        echo "NO ES TAG"
+                        echo "Se omite el Deploy"
+                    }
+                }
 
                 timeout(time:5, unit:'DAYS'){
+                    // Email de solicitud para continuar con el Deploy
+                    mail to: 'nicolas.solignac@sondeos.com.ar',
+                        from: 'YourFriendlyNeighbourJenkins',
+                        subject: "Se requiere aprovacion para: ${currentBuild.fullDisplayName}",
+                        body: "Se requiere aprovacion para proceder con el Deploy de ${currentBuild.fullDisplayName} en ${env.NODE_NAME}.\nAcceder al siguiente link: ${env.RUN_DISPLAY_URL}"
+                    // Pedimos al usuario encargado que valide el Deploy
                     input message:'Aprobar Deploy en Prod?', submitter: "admin"
+                    // Deploy
+                    echo "Se comienza el DEPLOY en "+"${env.NODE_NAME}"+'.'
+                    // DEPLOY SCRIPT {}
+                    echo "Se finaliza el DEPLOY en "+"${env.NODE_NAME}"+'.'
 
-                checkout([$class: 'GitSCM',
-                          branches: [[name: "${params.GIT_TAG}"]],
-                          doGenerateSubmoduleConfigurations: false,
-                          extensions: [],
-                          gitTool: 'Default',
-                          submoduleCfg: [],
-                        ])
-
+                    // Validacion para el proceso de rollback
                     script {
                         if (currentBuild.currentResult == 'SUCCESS') {
                             echo "Se realizo el deploy de la version ${GIT_TAG}"
                             echo "Resultado de la build: ${currentBuild.currentResult}"
                         }
                         else {
-                            echo "Resultado de la build: ${currentBuild.currentResult}"
+                            // Script rollback
+                            echo "WARNING: Resultado de la build: ${currentBuild.currentResult}"
                         }
                     }
                 }
             }
 
-            post {
+            /*post {
                 success {
                     echo 'Cambios implementados en '+"${env.NODE_NAME}"+'.'
 
-                    updateGitlabCommitStatus name: 'build', state: 'success'
-
-                    /*mail to: 'noc@sondeos.com.ar',
-                        from: 'NoReply@sondeos.com.ar',
+                    mail to: 'noc@sondeos.com.ar',
+                        from: 'YourFriendlyNeighbourJenkins',
                         subject: "Pipeline Exitosa: ${currentBuild.fullDisplayName}",
-                        body: "Se concreto correctamente el deploy de ${env.BUILD_URL} en ${env.NODE_NAME}."*/
+                        body: "Se concreto correctamente el deploy de ${env.BUILD_URL} en ${env.NODE_NAME}."
                 }
 
                 failure {
                     echo 'Deploy fallido en '+"${env.NODE_NAME}"+'.'
 
-                    updateGitlabCommitStatus name: 'build', state: 'failed'
-
-                    /*mail to: 'noc@sondeos.com.ar',
-                        from: 'NoReply@sondeos.com.ar',
+                    mail to: 'noc@sondeos.com.ar',
+                        from: 'YourFriendlyNeighbourJenkins',
                         subject: "Pipeline Fallida: ${currentBuild.fullDisplayName}",
-                        body: "Algo esta mal con ${env.BUILD_URL} en ${env.NODE_NAME}."*/
+                        body: "Algo esta mal con ${env.BUILD_URL} en ${env.NODE_NAME}."
                 }
-            }
+            }*/
         }
     }
 }

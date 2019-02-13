@@ -1,19 +1,16 @@
 pipeline {
     agent none
-    // Actulizamos el estado de la build en la herramienta SCM
+    // Actualizamos el estado de la build en la herramienta SCM
     post {
         success {
             updateGitlabCommitStatus name: 'build', state: 'success'
         }
-
         failure {
             updateGitlabCommitStatus name: 'build', state: 'failed'
 
         }
-
         aborted {
             updateGitlabCommitStatus name: 'build', state: 'canceled'
-
         }
     }
 
@@ -74,7 +71,6 @@ pipeline {
                 step([$class: 'hudson.plugins.checkstyle.CheckStylePublisher', pattern: '**/target/checkstyle-result.xml'])
                 step([$class: 'PmdPublisher', pattern: '**/target/pmd.xml'])
                 step([$class: 'FindBugsPublisher', pattern: '**/findbugsXml.xml'])
-
             }
         }
 
@@ -89,10 +85,10 @@ pipeline {
             steps{
                 // Checkout con los ultimos cambios (incluyendo los commits)
                 checkout scm
+                // Corremos los tests
                 sh "mvn test"
-
+                // Archivamos los resultados y los publicamos
                 step([$class: 'JUnitResultArchiver', testResults: '**/target/surefire-reports/*.xml', healthScaleFactor: 1.0])
-
             }
         }
 
@@ -103,7 +99,7 @@ pipeline {
                     steps {
                         // Checkout con los ultimos cambios (incluyendo los commits)
                         checkout scm
-                        echo "Se comienza el DEPLOY en "+"${env.NODE_NAME}"+'.'
+                        echo "Se comienza el DEPLOY en "+"${env.NODE_NAME}"
 
                         // Deploy script
                         sh '''
@@ -126,7 +122,7 @@ pipeline {
                         cp ${WORKSPACE}/target/*.jar $FILENAME && echo "Se realizo el DEPLOY"
 
                         # Artifact perms
-                        echo "Actulizamos los permisos"
+                        echo "Actualizamos los permisos"
                         chown --reference *.jar_$(date +%d-%m-%Y) $FILENAME
                         chmod --reference *.jar_$(date +%d-%m-%Y) $FILENAME
 
@@ -138,10 +134,10 @@ pipeline {
                         /usr/sbin/service $API stop || true
                         sleep 1
                         /usr/sbin/service $API start
+                        # Verificamos que el servicio esta corriendo
                         ps aux | grep -v grep | grep $FILENAME
-
                         '''
-                        echo "Se finaliza el DEPLOY en "+"${env.NODE_NAME}"+'.'
+                        echo "Se finaliza el DEPLOY en "+"${env.NODE_NAME}"
                     }
                 }
 
@@ -176,62 +172,110 @@ pipeline {
                                 from: 'YourFriendlyNeighbourJenkins',
                                 subject: "Se requiere aprovacion para: ${currentBuild.fullDisplayName}",
                                 body: "Se requiere aprovacion para proceder con el Deploy de ${currentBuild.fullDisplayName} en ${env.NODE_NAME}.\nAcceder al siguiente link: ${env.RUN_DISPLAY_URL}"
+
                             // Pedimos al usuario encargado que valide el Deploy
                             input message:'Aprueba el Deploy en QA?', submitter: "QA"
                             // TODO: if (${env.BUILD_USER_EMAIL} == ?? ) {wathever}
+
+                            // Imprimimos el nombre y mail del usuario que inicio el build
                             wrap([$class: 'BuildUser']) {
                             echo "${env.BUILD_USER}"
                             echo "${env.BUILD_USER_EMAIL}"
                             }
-                            // Deploy
-                            echo "Se comienza el DEPLOY en "+"${env.NODE_NAME}"+'.'
-                            // DEPLOY SCRIPT
-                            /*sh '''
-
-                            # Definimos la ruta de trabajo
-                            ROOTDIR="/usr/CMP/servicios_cmp_backend"
-
-                            # Limpiamos la carpeta de los binarios obsoletos
-                            cd $ROOTDIR
-                            rm *.jar_* || true
-
-                            # Guardamos el nombre del archivo de BACKUP
-                            FILENAME=servicios_cmp_backend.jar
-
-                            # Realizo el BACKUP
-                            cp ${FILENAME} ${FILENAME}_$(date +%d-%m-%Y) || true
-
-                            # DEPLOY
-                            echo "Se comienza con el DEPLOY"
-                            cp ${WORKSPACE}/target/*.jar $FILENAME && echo "Se realizo el DEPLOY"
-
-                            # Artifact perms
-                            echo "Actulizamos los permisos"
-                            chown --reference *.jar_$(date +%d-%m-%Y) $FILENAME
-                            chmod --reference *.jar_$(date +%d-%m-%Y) $FILENAME
-
-                            # Variable API
-                            API="servicios-cmp-backend"
-
-                            # Control del servicio
-                            echo "Reiniciando el servicio"
-                            /usr/sbin/service $API stop || true
-                            sleep 1
-                            /usr/sbin/service $API start
-                            ps aux | grep -v grep | grep $FILENAME
-
-                            '''*/
-                            echo "Se finaliza el DEPLOY en "+"${env.NODE_NAME}"+'.'
-
-                            // Validacion para el proceso de rollback
                             script {
                                 if (currentBuild.currentResult == 'SUCCESS') {
-                                    echo "Se realizo el deploy de la version ${GIT_TAG}"
-                                    echo "Resultado de la build: ${currentBuild.currentResult}"
+                                    // Deploy
+                                    echo "Se comienza el DEPLOY en "+"${env.NODE_NAME}"
+                                    // DEPLOY SCRIPT
+                                    /*sh '''
+
+                                    # Definimos la ruta de trabajo
+                                    ROOTDIR="/usr/CMP/servicios_cmp_backend"
+
+                                    # Limpiamos la carpeta de los binarios obsoletos
+                                    cd $ROOTDIR
+                                    rm *.jar_* || true
+
+                                    # Guardamos el nombre del archivo de BACKUP
+                                    FILENAME=servicios_cmp_backend.jar
+
+                                    # Realizo el BACKUP
+                                    cp ${FILENAME} ${FILENAME}_$(date +%d-%m-%Y) || true
+
+                                    # DEPLOY
+                                    echo "Se comienza con el DEPLOY"
+                                    cp ${WORKSPACE}/target/*.jar $FILENAME && echo "Se realizo el DEPLOY"
+
+                                    # Artifact perms
+                                    echo "Actualizamos los permisos"
+                                    chown --reference *.jar_$(date +%d-%m-%Y) $FILENAME
+                                    chmod --reference *.jar_$(date +%d-%m-%Y) $FILENAME
+
+                                    # Variable API
+                                    API="servicios-cmp-backend"
+
+                                    # Control del servicio
+                                    echo "Reiniciando el servicio"
+                                    /usr/sbin/service $API stop || true
+                                    sleep 1
+                                    /usr/sbin/service $API start
+                                    ps aux | grep -v grep | grep $FILENAME
+
+                                    '''*/
+                                    echo "Se finaliza el DEPLOY en "+"${env.NODE_NAME}"+" de la version "+"${GIT_TAG}"
                                 }
                                 else {
-                                    // Script rollback
                                     echo "WARNING: Resultado de la build: ${currentBuild.currentResult}"
+                                    // Script rollback
+                                    /*sh '''
+
+                                    # Definimos la ruta de trabajo
+                                    ROOTDIR="/usr/CMP/servicios_cmp_backend"
+
+                                    # Limpiamos la carpeta de los binarios obsoletos
+                                    cd $ROOTDIR
+                                    rm *.jar_* || true
+
+                                    # Guardamos el nombre del archivo de BACKUP
+                                    FILENAME=servicios_cmp_backend.jar
+
+                                    # Realizo el BACKUP
+                                    cp ${FILENAME} ${FILENAME}_$(date +%d-%m-%Y) || true
+
+                                    # DEPLOY
+                                    echo "Se comienza con el DEPLOY"
+                                    cp ${WORKSPACE}/target/*.jar $FILENAME && echo "Se realizo el DEPLOY"
+
+                                    # Artifact perms
+                                    echo "Actualizamos los permisos"
+                                    chown --reference *.jar_$(date +%d-%m-%Y) $FILENAME
+                                    chmod --reference *.jar_$(date +%d-%m-%Y) $FILENAME
+
+                                    # Variable API
+                                    API="servicios-cmp-backend"
+
+                                    # Control del servicio
+                                    echo "Reiniciando el servicio"
+                                    /usr/sbin/service $API stop || true
+                                    sleep 3
+                                    /usr/sbin/service $API start
+                                    ps aux | grep -v grep | grep $FILENAME
+
+                                    # Verificamos que el servicio esta corriendo
+                                    if systemctl is-active --quiet $API.service == 0; then
+                                      true
+                                    else
+                                      # Realizamos el Rollback
+                                      cp ${FILENAME}_$(date +%d-%m-%Y) ${FILENAME}
+
+                                      # Reiniciamos el servicio
+                                     echo "Reiniciando el servicio"
+                                     /usr/sbin/service $API stop || true
+                                     sleep 3
+                                     /usr/sbin/service $API start
+                                     ps aux | grep -v grep | grep $FILENAME
+
+                                    '''*/
                                 }
                             }
                         }
@@ -240,7 +284,7 @@ pipeline {
                     // Email informando el resultado del Deploy en el ambiente
                     post {
                         success {
-                            echo 'Cambios implementados en '+"${env.NODE_NAME}"+'.'
+                            echo 'Cambios implementados en '+"${env.NODE_NAME}"
 
                             mail to: 'nicolas.solignac@sondeos.com.ar',
                                 from: 'YourFriendlyNeighbourJenkins',
@@ -249,7 +293,7 @@ pipeline {
                         }
 
                         failure {
-                            echo 'Deploy fallido en '+"${env.NODE_NAME}"+'.'
+                            echo 'Deploy fallido en '+"${env.NODE_NAME}"
 
                             mail to: 'nicolas.solignac@sondeos.com.ar',
                                 from: 'YourFriendlyNeighbourJenkins',
@@ -294,19 +338,101 @@ pipeline {
                         body: "Se requiere aprovacion para proceder con el Deploy de ${currentBuild.fullDisplayName} en ${env.NODE_NAME}.\nAcceder al siguiente link: ${env.RUN_DISPLAY_URL}"
                     // Pedimos al usuario encargado que valide el Deploy
                     input message:'Aprobar Deploy en Prod?', submitter: "admin"
-                    // Deploy
-                    echo "Se comienza el DEPLOY en "+"${env.NODE_NAME}"+'.'
-                    // DEPLOY SCRIPT {}
-                    echo "Se finaliza el DEPLOY en "+"${env.NODE_NAME}"+'.'
 
-                    // Validacion para el proceso de rollback
                     script {
                         if (currentBuild.currentResult == 'SUCCESS') {
-                            echo "Se realizo el deploy de la version ${GIT_TAG}"
+                            // Deploy
+                            echo "Se comienza el DEPLOY en "+"${env.NODE_NAME}"
+                            // DEPLOY SCRIPT
+                            /*sh '''
+
+                            # Definimos la ruta de trabajo
+                            ROOTDIR="/usr/CMP/servicios_cmp_backend"
+
+                            # Limpiamos la carpeta de los binarios obsoletos
+                            cd $ROOTDIR
+                            rm *.jar_* || true
+
+                            # Guardamos el nombre del archivo de BACKUP
+                            FILENAME=servicios_cmp_backend.jar
+
+                            # Realizo el BACKUP
+                            cp ${FILENAME} ${FILENAME}_$(date +%d-%m-%Y) || true
+
+                            # DEPLOY
+                            echo "Se comienza con el DEPLOY"
+                            cp ${WORKSPACE}/target/*.jar $FILENAME && echo "Se realizo el DEPLOY"
+
+                            # Artifact perms
+                            echo "Actualizamos los permisos"
+                            chown --reference *.jar_$(date +%d-%m-%Y) $FILENAME
+                            chmod --reference *.jar_$(date +%d-%m-%Y) $FILENAME
+
+                            # Variable API
+                            API="servicios-cmp-backend"
+
+                            # Control del servicio
+                            echo "Reiniciando el servicio"
+                            /usr/sbin/service $API stop || true
+                            sleep 1
+                            /usr/sbin/service $API start
+                            ps aux | grep -v grep | grep $FILENAME
+
+                            '''*/
+                            echo "Se finaliza el DEPLOY en "+"${env.NODE_NAME}"+" de la version "+"${GIT_TAG}"
                             echo "Resultado de la build: ${currentBuild.currentResult}"
                         }
                         else {
                             // Script rollback
+                            /*sh '''
+
+                            # Definimos la ruta de trabajo
+                            ROOTDIR="/usr/CMP/servicios_cmp_backend"
+
+                            # Limpiamos la carpeta de los binarios obsoletos
+                            cd $ROOTDIR
+                            rm *.jar_* || true
+
+                            # Guardamos el nombre del archivo de BACKUP
+                            FILENAME=servicios_cmp_backend.jar
+
+                            # Realizo el BACKUP
+                            cp ${FILENAME} ${FILENAME}_$(date +%d-%m-%Y) || true
+
+                            # DEPLOY
+                            echo "Se comienza con el DEPLOY"
+                            cp ${WORKSPACE}/target/*.jar $FILENAME && echo "Se realizo el DEPLOY"
+
+                            # Artifact perms
+                            echo "Actualizamos los permisos"
+                            chown --reference *.jar_$(date +%d-%m-%Y) $FILENAME
+                            chmod --reference *.jar_$(date +%d-%m-%Y) $FILENAME
+
+                            # Variable API
+                            API="servicios-cmp-backend"
+
+                            # Control del servicio
+                            echo "Reiniciando el servicio"
+                            /usr/sbin/service $API stop || true
+                            sleep 3
+                            /usr/sbin/service $API start
+                            ps aux | grep -v grep | grep $FILENAME
+
+                            # Verificamos que el servicio esta corriendo
+                            if systemctl is-active --quiet $API.service == 0; then
+                              true
+                            else
+                              # Realizamos el Rollback
+                              cp ${FILENAME}_$(date +%d-%m-%Y) ${FILENAME}
+
+                              # Reiniciamos el servicio
+                             echo "Reiniciando el servicio"
+                             /usr/sbin/service $API stop || true
+                             sleep 3
+                             /usr/sbin/service $API start
+                             ps aux | grep -v grep | grep $FILENAME
+
+                            '''*/
                             echo "WARNING: Resultado de la build: ${currentBuild.currentResult}"
                         }
                     }
@@ -315,7 +441,7 @@ pipeline {
 
             /*post {
                 success {
-                    echo 'Cambios implementados en '+"${env.NODE_NAME}"+'.'
+                    echo 'Cambios implementados en '+"${env.NODE_NAME}"
 
                     mail to: 'noc@sondeos.com.ar',
                         from: 'YourFriendlyNeighbourJenkins',
@@ -324,7 +450,7 @@ pipeline {
                 }
 
                 failure {
-                    echo 'Deploy fallido en '+"${env.NODE_NAME}"+'.'
+                    echo 'Deploy fallido en '+"${env.NODE_NAME}"
 
                     mail to: 'noc@sondeos.com.ar',
                         from: 'YourFriendlyNeighbourJenkins',

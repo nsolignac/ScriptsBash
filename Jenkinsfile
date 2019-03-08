@@ -382,7 +382,7 @@ pipeline {
                             echo "Se finaliza el DEPLOY en "+"${env.NODE_NAME}"+" de la version "+"${GIT_TAG}"
                             echo "Resultado de la build: ${currentBuild.currentResult}"
                         }
-                        else {
+                        /*else {
                             // Script rollback
                             /*sh '''
 
@@ -433,8 +433,9 @@ pipeline {
                              ps aux | grep -v grep | grep $FILENAME
 
                             '''*/
+                            /*
                             echo "WARNING: Resultado de la build: ${currentBuild.currentResult}"
-                        }
+                        }*/
                     }
                 }
             }
@@ -459,5 +460,81 @@ pipeline {
                 }
             }*/
         }
+
+        stage ('Rollback'){
+            agent any
+            steps{
+                script{
+                    def proceed = true
+                    try {
+                    timeout(time:5, unit:'DAYS'){
+                        // Email de solicitud para continuar con el Deploy
+                        mail to: 'nicolas.solignac@sondeos.com.ar',
+                            from: 'YourFriendlyNeighbourJenkins',
+                            subject: "Se requiere aprovacion para Rollback del Job: ${currentBuild.fullDisplayName}",
+                            body: "Se requiere aprovacion para proceder con el Rollback de ${currentBuild.fullDisplayName} en ${env.NODE_NAME}.\nAcceder al siguiente link: ${env.RUN_DISPLAY_URL}"
+                        // Pedimos al usuario encargado que valide el Deploy
+                        input message:'Aprobar Rollback del Deploy en Prod?', submitter: "admin"}
+                        } catch (err) {
+                            proceed = false
+                        }
+                        if(proceed) {
+                            echo "Se inicia el proceso de Rollback"
+                            // Script rollback
+                            /*sh '''
+
+                            # Definimos la ruta de trabajo
+                            ROOTDIR="/usr/CMP/servicios_cmp_backend"
+
+                            # Limpiamos la carpeta de los binarios obsoletos
+                            cd $ROOTDIR
+                            rm *.jar_* || true
+
+                            # Guardamos el nombre del archivo de BACKUP
+                            FILENAME=servicios_cmp_backend.jar
+
+                            # Realizo el BACKUP
+                            cp ${FILENAME} ${FILENAME}_$(date +%d-%m-%Y) || true
+
+                            # DEPLOY
+                            echo "Se comienza con el DEPLOY"
+                            cp ${WORKSPACE}/target/*.jar $FILENAME && echo "Se realizo el DEPLOY"
+
+                            # Artifact perms
+                            echo "Actualizamos los permisos"
+                            chown --reference *.jar_$(date +%d-%m-%Y) $FILENAME
+                            chmod --reference *.jar_$(date +%d-%m-%Y) $FILENAME
+
+                            # Variable API
+                            API="servicios-cmp-backend"
+
+                            # Control del servicio
+                            echo "Reiniciando el servicio"
+                            /usr/sbin/service $API stop || true
+                            sleep 3
+                            /usr/sbin/service $API start
+                            ps aux | grep -v grep | grep $FILENAME
+
+                            # Verificamos que el servicio esta corriendo
+                            if systemctl is-active --quiet $API.service == 0; then
+                              true
+                            else
+                              # Realizamos el Rollback
+                              cp ${FILENAME}_$(date +%d-%m-%Y) ${FILENAME}
+
+                              # Reiniciamos el servicio
+                             echo "Reiniciando el servicio"
+                             /usr/sbin/service $API stop || true
+                             sleep 3
+                             /usr/sbin/service $API start
+                             ps aux | grep -v grep | grep $FILENAME
+
+                            '''*/
+                            echo "Se realizo el Rollback de la version ${params.GIT_TAG}"
+                            echo "WARNING: Resultado de la build: ${currentBuild.currentResult}"
+                        }
+                    }
+                }
+            }
+        }
     }
-}

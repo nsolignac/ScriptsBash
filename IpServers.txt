@@ -85,6 +85,7 @@ Server's IP:
 
 
 - Worker frontera2 (CON balancer)
+	192.168.9.19 - f21
 	192.168.9.196 - f22
 	192.168.9.105 - f23
 	192.168.9.62 - f24

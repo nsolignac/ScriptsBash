@@ -171,3 +171,6 @@ Server's IP:
 
 - Redmine Visados Vlopez
   192.168.34.144
+
+- Redmine Visados DB
+  192.168.34.141

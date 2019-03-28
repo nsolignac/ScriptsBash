@@ -7,7 +7,6 @@ pipeline {
         }
         failure {
             updateGitlabCommitStatus name: 'build', state: 'failed'
-
         }
         aborted {
             updateGitlabCommitStatus name: 'build', state: 'canceled'
@@ -145,24 +144,28 @@ pipeline {
                     agent {label 'QA - 110'}
                     steps{
                         script {
-                            // Checkout utilizando el parametro que contiene el ID del TAG
-                            checkout([$class: 'GitSCM',
+                            // Chequeamos que el repositorio esta inicializado
+                            def initialized = sh(returnStdout: true, script: "git tag --list").trim()
+                            // Lo inicializamos en caso de que no lo este
+                            if (!initialized){
+                                checkout scm
+                            }
+                            else {
+                                // Checkout utilizando el parametro que contiene el ID del TAG
+                                checkout([$class: 'GitSCM',
                                       branches: [[name: "${params.GIT_TAG}"]],
                                       doGenerateSubmoduleConfigurations: false,
                                       extensions: [],
                                       gitTool: 'Default',
                                       submoduleCfg: [],
                                     ])
+                            }
 
                             // Verificamos que la Build sea por un TAG
                             def tag = sh(returnStdout: true, script: "git tag --contains | head -1").trim()
                             if (tag) {
                                 echo "ES TAG"
                                 echo "Checking out: ${params.GIT_TAG}"
-                            }
-                            else {
-                                echo "NO ES TAG"
-                                echo "Se omite el Deploy"
                             }
                         }
 
@@ -182,7 +185,13 @@ pipeline {
                             echo "${env.BUILD_USER}"
                             echo "${env.BUILD_USER_EMAIL}"
                             }
+
                             script {
+                                // Proporcionamos el archivo de configuracion correspondiente al entorno
+                                configFileProvider(
+                                    [configFile(fileId: 'qa-settings', variable: 'QA_SETTINGS', targetLocation: 'qa_settings')]) {
+                                }
+
                                 if (currentBuild.currentResult == 'SUCCESS') {
                                     // Deploy
                                     echo "Se comienza el DEPLOY en "+"${env.NODE_NAME}"
@@ -284,21 +293,47 @@ pipeline {
                     // Email informando el resultado del Deploy en el ambiente
                     post {
                         success {
-                            echo 'Cambios implementados en '+"${env.NODE_NAME}"
+                            script {
+                                echo 'Cambios implementados en '+"${env.NODE_NAME}"
 
-                            mail to: 'nicolas.solignac@sondeos.com.ar',
-                                from: 'YourFriendlyNeighbourJenkins',
-                                subject: "Pipeline Exitosa: ${currentBuild.fullDisplayName}",
-                                body: "Se concreto correctamente el deploy de ${env.BUILD_URL} en ${env.NODE_NAME}."
+                                def mailRecipients = "nicolas.solignac@sondeos.com.ar"
+                                def myProviders = [ [$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider'] ];
+                                myProviders.add ( [$class: 'RequesterRecipientProvider'] );
+
+                                def jobName = currentBuild.fullDisplayName
+
+                                emailext attachLog: true,
+                                    //body: '''${SCRIPT, template="groovy-html.template"}''',
+                                    body: '''${JELLY_SCRIPT,template="JenkinsHtmlEmail"}''',
+                                    compressLog: true,
+                                    mimeType: 'text/html',
+                                    subject: "Pipeline Exitosa: ${jobName}",
+                                    to: "${mailRecipients}",
+                                    replyTo: "${mailRecipients}",
+                                    recipientProviders: [[$class: 'CulpritsRecipientProvider']]
+                            }
                         }
 
                         failure {
-                            echo 'Deploy fallido en '+"${env.NODE_NAME}"
+                            script {
+                                echo 'Deploy fallido en '+"${env.NODE_NAME}"
 
-                            mail to: 'nicolas.solignac@sondeos.com.ar',
-                                from: 'YourFriendlyNeighbourJenkins',
-                                subject: "Pipeline Fallida: ${currentBuild.fullDisplayName}",
-                                body: "Algo esta mal con ${env.BUILD_URL} en ${env.NODE_NAME}."
+                                def mailRecipients = "nicolas.solignac@sondeos.com.ar"
+                                def myProviders = [ [$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider'] ];
+                                myProviders.add ( [$class: 'RequesterRecipientProvider'] );
+
+                                def jobName = currentBuild.fullDisplayName
+
+                                emailext attachLog: true,
+                                    //body: '''${SCRIPT, template="groovy-html.template"}''',
+                                    body: '''${JELLY_SCRIPT,template="JenkinsHtmlEmail"}''',
+                                    compressLog: true,
+                                    mimeType: 'text/html',
+                                    subject: "Pipeline Fallida: ${jobName}",
+                                    to: "${mailRecipients}",
+                                    replyTo: "${mailRecipients}",
+                                    recipientProviders: [[$class: 'CulpritsRecipientProvider']]
+                            }
                         }
                     }
                 }
@@ -323,140 +358,163 @@ pipeline {
                     if (tag) {
                         echo "ES TAG"
                         echo "Checking out: ${params.GIT_TAG}"
+
+                        timeout(time:5, unit:'DAYS'){
+                            // Email de solicitud para continuar con el Deploy
+                            mail to: 'nicolas.solignac@sondeos.com.ar',
+                                from: 'YourFriendlyNeighbourJenkins',
+                                subject: "Se requiere aprovacion para: ${currentBuild.fullDisplayName}",
+                                body: "Se requiere aprovacion para proceder con el Deploy de ${currentBuild.fullDisplayName} en ${env.NODE_NAME}.\nAcceder al siguiente link: ${env.RUN_DISPLAY_URL}"
+                            // Pedimos al usuario encargado que valide el Deploy
+                            input message:'Aprobar Deploy en Prod?', submitter: "admin"
+
+                            script {
+                                // Proporcionamos el archivo de configuracion correspondiente al entorno
+                                configFileProvider(
+                                    [configFile(fileId: 'prod-setting', variable: 'PROD_SETTING', targetLocation: 'prod_settings')]) {
+                                }
+
+                                if (currentBuild.currentResult == 'SUCCESS') {
+                                    // Deploy
+                                    echo "Se comienza el DEPLOY en "+"${env.NODE_NAME}"
+                                    // DEPLOY SCRIPT
+                                    /*sh '''
+
+                                    # Definimos la ruta de trabajo
+                                    ROOTDIR="/usr/CMP/servicios_cmp_backend"
+
+                                    # Limpiamos la carpeta de los binarios obsoletos
+                                    cd $ROOTDIR
+                                    rm *.jar_* || true
+
+                                    # Guardamos el nombre del archivo de BACKUP
+                                    FILENAME=servicios_cmp_backend.jar
+
+                                    # Realizo el BACKUP
+                                    cp ${FILENAME} ${FILENAME}_$(date +%d-%m-%Y) || true
+
+                                    # DEPLOY
+                                    echo "Se comienza con el DEPLOY"
+                                    cp ${WORKSPACE}/target/*.jar $FILENAME && echo "Se realizo el DEPLOY"
+
+                                    # Artifact perms
+                                    echo "Actualizamos los permisos"
+                                    chown --reference *.jar_$(date +%d-%m-%Y) $FILENAME
+                                    chmod --reference *.jar_$(date +%d-%m-%Y) $FILENAME
+
+                                    # Variable API
+                                    API="servicios-cmp-backend"
+
+                                    # Control del servicio
+                                    echo "Reiniciando el servicio"
+                                    /usr/sbin/service $API stop || true
+                                    sleep 1
+                                    /usr/sbin/service $API start
+                                    ps aux | grep -v grep | grep $FILENAME
+
+                                    '''*/
+                                    echo "Se finaliza el DEPLOY en "+"${env.NODE_NAME}"+" de la version "+"${GIT_TAG}"
+                                    echo "Resultado de la build: ${currentBuild.currentResult}"
+                                }
+                                /*else {
+                                    // Script rollback
+                                    /*sh '''
+
+                                    # Definimos la ruta de trabajo
+                                    ROOTDIR="/usr/CMP/servicios_cmp_backend"
+
+                                    # Limpiamos la carpeta de los binarios obsoletos
+                                    cd $ROOTDIR
+                                    rm *.jar_* || true
+
+                                    # Guardamos el nombre del archivo de BACKUP
+                                    FILENAME=servicios_cmp_backend.jar
+
+                                    # Realizo el BACKUP
+                                    cp ${FILENAME} ${FILENAME}_$(date +%d-%m-%Y) || true
+
+                                    # DEPLOY
+                                    echo "Se comienza con el DEPLOY"
+                                    cp ${WORKSPACE}/target/*.jar $FILENAME && echo "Se realizo el DEPLOY"
+
+                                    # Artifact perms
+                                    echo "Actualizamos los permisos"
+                                    chown --reference *.jar_$(date +%d-%m-%Y) $FILENAME
+                                    chmod --reference *.jar_$(date +%d-%m-%Y) $FILENAME
+
+                                    # Variable API
+                                    API="servicios-cmp-backend"
+
+                                    # Control del servicio
+                                    echo "Reiniciando el servicio"
+                                    /usr/sbin/service $API stop || true
+                                    sleep 3
+                                    /usr/sbin/service $API start
+                                    ps aux | grep -v grep | grep $FILENAME
+
+                                    # Verificamos que el servicio esta corriendo
+                                    if systemctl is-active --quiet $API.service == 0; then
+                                      true
+                                    else
+                                      # Realizamos el Rollback
+                                      cp ${FILENAME}_$(date +%d-%m-%Y) ${FILENAME}
+
+                                      # Reiniciamos el servicio
+                                     echo "Reiniciando el servicio"
+                                     /usr/sbin/service $API stop || true
+                                     sleep 3
+                                     /usr/sbin/service $API start
+                                     ps aux | grep -v grep | grep $FILENAME
+
+                                    '''*/
+                                    /*
+                                    echo "WARNING: Resultado de la build: ${currentBuild.currentResult}"
+                                }*/
+                            }
+                        }
                     }
                     else {
                         echo "NO ES TAG"
                         echo "Se omite el Deploy"
                     }
                 }
-
-                timeout(time:5, unit:'DAYS'){
-                    // Email de solicitud para continuar con el Deploy
-                    mail to: 'nicolas.solignac@sondeos.com.ar',
-                        from: 'YourFriendlyNeighbourJenkins',
-                        subject: "Se requiere aprovacion para: ${currentBuild.fullDisplayName}",
-                        body: "Se requiere aprovacion para proceder con el Deploy de ${currentBuild.fullDisplayName} en ${env.NODE_NAME}.\nAcceder al siguiente link: ${env.RUN_DISPLAY_URL}"
-                    // Pedimos al usuario encargado que valide el Deploy
-                    input message:'Aprobar Deploy en Prod?', submitter: "admin"
-
-                    script {
-                        if (currentBuild.currentResult == 'SUCCESS') {
-                            // Deploy
-                            echo "Se comienza el DEPLOY en "+"${env.NODE_NAME}"
-                            // DEPLOY SCRIPT
-                            /*sh '''
-
-                            # Definimos la ruta de trabajo
-                            ROOTDIR="/usr/CMP/servicios_cmp_backend"
-
-                            # Limpiamos la carpeta de los binarios obsoletos
-                            cd $ROOTDIR
-                            rm *.jar_* || true
-
-                            # Guardamos el nombre del archivo de BACKUP
-                            FILENAME=servicios_cmp_backend.jar
-
-                            # Realizo el BACKUP
-                            cp ${FILENAME} ${FILENAME}_$(date +%d-%m-%Y) || true
-
-                            # DEPLOY
-                            echo "Se comienza con el DEPLOY"
-                            cp ${WORKSPACE}/target/*.jar $FILENAME && echo "Se realizo el DEPLOY"
-
-                            # Artifact perms
-                            echo "Actualizamos los permisos"
-                            chown --reference *.jar_$(date +%d-%m-%Y) $FILENAME
-                            chmod --reference *.jar_$(date +%d-%m-%Y) $FILENAME
-
-                            # Variable API
-                            API="servicios-cmp-backend"
-
-                            # Control del servicio
-                            echo "Reiniciando el servicio"
-                            /usr/sbin/service $API stop || true
-                            sleep 1
-                            /usr/sbin/service $API start
-                            ps aux | grep -v grep | grep $FILENAME
-
-                            '''*/
-                            echo "Se finaliza el DEPLOY en "+"${env.NODE_NAME}"+" de la version "+"${GIT_TAG}"
-                            echo "Resultado de la build: ${currentBuild.currentResult}"
-                        }
-                        /*else {
-                            // Script rollback
-                            /*sh '''
-
-                            # Definimos la ruta de trabajo
-                            ROOTDIR="/usr/CMP/servicios_cmp_backend"
-
-                            # Limpiamos la carpeta de los binarios obsoletos
-                            cd $ROOTDIR
-                            rm *.jar_* || true
-
-                            # Guardamos el nombre del archivo de BACKUP
-                            FILENAME=servicios_cmp_backend.jar
-
-                            # Realizo el BACKUP
-                            cp ${FILENAME} ${FILENAME}_$(date +%d-%m-%Y) || true
-
-                            # DEPLOY
-                            echo "Se comienza con el DEPLOY"
-                            cp ${WORKSPACE}/target/*.jar $FILENAME && echo "Se realizo el DEPLOY"
-
-                            # Artifact perms
-                            echo "Actualizamos los permisos"
-                            chown --reference *.jar_$(date +%d-%m-%Y) $FILENAME
-                            chmod --reference *.jar_$(date +%d-%m-%Y) $FILENAME
-
-                            # Variable API
-                            API="servicios-cmp-backend"
-
-                            # Control del servicio
-                            echo "Reiniciando el servicio"
-                            /usr/sbin/service $API stop || true
-                            sleep 3
-                            /usr/sbin/service $API start
-                            ps aux | grep -v grep | grep $FILENAME
-
-                            # Verificamos que el servicio esta corriendo
-                            if systemctl is-active --quiet $API.service == 0; then
-                              true
-                            else
-                              # Realizamos el Rollback
-                              cp ${FILENAME}_$(date +%d-%m-%Y) ${FILENAME}
-
-                              # Reiniciamos el servicio
-                             echo "Reiniciando el servicio"
-                             /usr/sbin/service $API stop || true
-                             sleep 3
-                             /usr/sbin/service $API start
-                             ps aux | grep -v grep | grep $FILENAME
-
-                            '''*/
-                            /*
-                            echo "WARNING: Resultado de la build: ${currentBuild.currentResult}"
-                        }*/
-                    }
-                }
             }
 
             /*post {
                 success {
-                    echo 'Cambios implementados en '+"${env.NODE_NAME}"
+                    script {
+                        echo 'Cambios implementados en '+"${env.NODE_NAME}"
 
-                    mail to: 'noc@sondeos.com.ar',
-                        from: 'YourFriendlyNeighbourJenkins',
-                        subject: "Pipeline Exitosa: ${currentBuild.fullDisplayName}",
-                        body: "Se concreto correctamente el deploy de ${env.BUILD_URL} en ${env.NODE_NAME}."
+                        def mailRecipients = "nicolas.solignac@sondeos.com.ar"
+                        def jobName = currentBuild.fullDisplayName
+
+                        emailext attachLog: true,
+                            body: '''${SCRIPT, template="groovy-html.template"}''',
+                            compressLog: true,
+                            mimeType: 'text/html',
+                            subject: "Pipeline Exitosa: ${jobName}",
+                            to: "${mailRecipients}",
+                            replyTo: "${mailRecipients}",
+                            recipientProviders: [[$class: 'CulpritsRecipientProvider']]
+                    }
                 }
 
                 failure {
-                    echo 'Deploy fallido en '+"${env.NODE_NAME}"
+                    script {
+                        echo 'Deploy fallido en '+"${env.NODE_NAME}"
 
-                    mail to: 'noc@sondeos.com.ar',
-                        from: 'YourFriendlyNeighbourJenkins',
-                        subject: "Pipeline Fallida: ${currentBuild.fullDisplayName}",
-                        body: "Algo esta mal con ${env.BUILD_URL} en ${env.NODE_NAME}."
+                        def mailRecipients = "nicolas.solignac@sondeos.com.ar"
+                        def jobName = currentBuild.fullDisplayName
+
+                        emailext attachLog: true,
+                            body: '''${SCRIPT, template="groovy-html.template"}''',
+                            compressLog: true,
+                            mimeType: 'text/html',
+                            subject: "Pipeline Fallida: ${jobName}",
+                            to: "${mailRecipients}",
+                            replyTo: "${mailRecipients}",
+                            recipientProviders: [[$class: 'CulpritsRecipientProvider']]
+                    }
                 }
             }*/
         }
@@ -532,6 +590,9 @@ pipeline {
                             '''*/
                             echo "Se realizo el Rollback de la version ${params.GIT_TAG}"
                             echo "WARNING: Resultado de la build: ${currentBuild.currentResult}"
+                        }
+                        else {
+                            echo "Se aborta el proceso de Rollback"
                         }
                     }
                 }

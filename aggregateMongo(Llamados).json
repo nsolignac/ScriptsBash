@@ -1,13 +1,13 @@
 /* match pipeline */
 var match = {
     $match: {
-        "fechaLlamado": { "$gte" : ISODate("2018-08-01T00:00:00.000Z"),
-        		  "$lte" : ISODate("2018-08-31T23:59:59.999Z")}}
+        "fechaLlamado": { "$gte" : ISODate("2019-04-01T00:00:00.000Z"),
+        		  "$lte" : ISODate("2019-04-31T23:59:59.999Z")}}
 },
 /* group pipeline */
 group = {
     $group: {
-        idCamp : { $addToSet : "$idCampania"}, 
+        idCamp : { $addToSet : "$idCampania"},
         _id : "$idUsuario",
         totalMinutos: { $sum: "$duracionEnMinutos" },
     }

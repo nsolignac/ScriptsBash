@@ -4,7 +4,7 @@ var match = {
         		  "$lte" : ISODate("2019-02-31T23:59:59.999Z")},
         "idUsuario" : "961",
         "puntoDeInsercion" : "wsService"}
-},
+}
 
 var group = {
     $group: {

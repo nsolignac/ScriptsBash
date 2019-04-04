@@ -122,13 +122,13 @@ Server's IP:
   33.142 - Asterisk - 13.14.1
   33.157 - Asterisk - 13.14.1
   33.158 - Asterisk - 13.14.1
+  33.162 - Asterisk - 11.13.1
   33.175 - Asterisk - 13.14.1
   33.176 - Asterisk - 13.14.1
   33.177 - Asterisk - 13.14.1
   33.179 - Asterisk - 13.14.1
-  33.182 - Asterisk (AGI Saliente)
   33.180 - Asterisk - 13.14.1
-  33.162 - Asterisk - 11.13.1
+  33.182 - Asterisk (AGI Saliente)
 
 - Multichannel (Cloud Servers Telecom)
   200.61.208.140

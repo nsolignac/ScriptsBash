@@ -1,15 +1,17 @@
 var match = {
     $match: {
-        "fechaIngreso": { "$gte" : ISODate("2019-02-01T00:00:00.000Z"),
-        		  "$lte" : ISODate("2019-02-15T23:59:59.999Z")},
+        "fechaIngreso": { "$gte" : ISODate("2019-02-11T00:00:00.000Z"),
+        		  "$lte" : ISODate("2019-02-12T23:59:59.999Z")},
         "idUsuario" : "961",
-        "puntoDeInsercion" : "wsFrontera"}
+        "ultimoEstado" : {$in : [2, 102]},
+        "puntoDeInsercion" : "wsFrontera"
+                          }
 }
 
 var group = {
     $group: {
         _id : "$idUsuario",
-        count: { $sum: 1 }
+        cantidadDeMensajes: { $sum: 1 }
     }
 };
 

@@ -174,3 +174,6 @@ Server's IP:
 
 - Redmine Visados DB
   192.168.34.141
+
+- Procesador de audio CMP
+  192.168.33.117

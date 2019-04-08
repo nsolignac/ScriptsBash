@@ -177,3 +177,6 @@ Server's IP:
 
 - Procesador de audio CMP
   192.168.33.117
+
+- Redeterminaciones Vlopez
+  192.168.34.127

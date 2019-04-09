@@ -48,6 +48,7 @@ Server's IP:
 
 - Redmine Vicente Lopez - Visados
 	192.168.34.141
+  192.168.34.144
 
 
 - Multichannel (web)
@@ -168,9 +169,6 @@ Server's IP:
 
 - DB Mongo Celulares / Scripts / Number-Land
   192.168.33.113
-
-- Redmine Visados Vlopez
-  192.168.34.144
 
 - Redmine Visados DB
   192.168.34.141

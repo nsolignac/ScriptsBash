@@ -120,7 +120,7 @@ Server's IP:
 
 - Asterisk CMP
    9.131 - Asterisk (AGI Entrante)
-  33.142 - Asterisk - 13.14.1
+  33.142 - Asterisk - 13.14.1 / Push Server
   33.157 - Asterisk - 13.14.1
   33.158 - Asterisk - 13.14.1
   33.162 - Asterisk - 11.13.1
@@ -154,7 +154,7 @@ Server's IP:
 
 - Multichannel QA Web
 	192.168.20.105
-	
+
 - frontera 1
   192.168.9.43 - lnx22
   192.168.9.40 - lnx25

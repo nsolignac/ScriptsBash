@@ -1,4 +1,5 @@
 #!/bin/sh
+#TODO: Set MAIL server on server
 df -H | grep -vE '^Filesystem|tmpfs|cdrom' | awk '{ print $5 " " $1 }' | while read output;
 do
   echo $output

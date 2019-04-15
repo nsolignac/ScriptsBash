@@ -152,6 +152,9 @@ Server's IP:
 - Multichannel QA API
   192.168.20.101
 
+- Multichannel QA Web
+	192.168.20.105
+	
 - frontera 1
   192.168.9.43 - lnx22
   192.168.9.40 - lnx25

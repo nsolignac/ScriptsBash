@@ -1,0 +1,17 @@
+db.getCollection('MensajesBulk').insert(
+{
+   "canal" : "NumeroLargo",
+   "cola" : "NumeroLargo-Premium",
+   "origen" : "4321",
+   "destino" : "541133132840",
+   "mensaje" : "Test Sondeos Claro",
+   "prioridad" : 0,
+   "consultaEstado" : "0",
+   "idUsuario" : "4",
+   "esmeId" : "6",
+   "idNumero" : "15",
+   "fechaIngreso" : new ISODate(),
+   "reintentos" : "1",
+   "procesado" : 0
+}
+)

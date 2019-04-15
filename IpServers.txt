@@ -149,7 +149,7 @@ Server's IP:
 - FSales Prod
   192.168.9.53
 
-- Multichannel QA
+- Multichannel QA API
   192.168.20.101
 
 - frontera 1

@@ -2,20 +2,8 @@ def getProjectName() {
     return 'cmp-servicios'
 }
 
-def getJDKVersion() {
-    return 'jdk1.8.0_212'
-}
-
-def getMavenConfig() {
-    return 'maven-config'
-}
-
 def getDockerLocation() {
     return '/usr/bin/docker'
-}
-
-def getMavenLocation() {
-    return 'MAVEN_HOME'
 }
 
 def getEnvironment() {
@@ -24,8 +12,15 @@ def getEnvironment() {
             'PROD'
 }
 
+def getMyProviders() {
+    return [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']];
+            MyProviders.add ([$class: 'RequesterRecipientProvider']);
+}
+
+def jobName() = currentBuild.fullDisplayName
+
 def getEmailRecipients() {
-    return ''
+    return 'nicolas.solignac@sondeos.com.ar'
 }
 
 def getReportZipFile() {
@@ -186,7 +181,7 @@ pipeline {
                                         subject: "Se requiere aprovacion para: ${currentBuild.fullDisplayName}",
                                         body: "Se requiere aprovacion para proceder con el Deploy de ${currentBuild.fullDisplayName} en ${env.NODE_NAME}.\nAcceder al siguiente link: ${env.RUN_DISPLAY_URL}"
                                     // Pedimos al usuario encargado que valide el Deploy
-                                    input message:'Aprobar Deploy en Prod?', submitter: "admin"
+                                    input message:'Aprobar Deploy en QA?', submitter: "admin"
 
                                     // Proporcionamos el archivo de configuracion correspondiente al entorno.
                                     configFileProvider([configFile(fileId: 'a1aa3157-d30f-469c-98f1-414e5c6936dc',
@@ -206,33 +201,183 @@ pipeline {
                         }
                     }
                 }
+            }
 
-                post {
-                    // Run regardless of the completion status of the Pipeline run
-                    always {
-                        // send email
-                        // email template to be loaded from managed files
-                        emailext body: '${SCRIPT,template="managed:EmailTemplate"}',
-                                attachLog: true,
-                                compressLog: true,
-                                attachmentsPattern: "$reportZipFile",
-                                mimeType: 'text/html',
-                                subject: "Pipeline Build ${BUILD_NUMBER}",
-                                to: "${params.EMAIL_RECIPIENTS}"
-
-                        // clean up workspace
-                        deleteDir()
-                    }
-                    // Only run the steps if the current Pipeline’s or stage’s run has a "success" status
-                    success {
-                        updateGitlabCommitStatus name: 'build', state: 'success'
-                    }
-                    // Only run the steps if the current Pipeline’s or stage’s run has a "failure" status
-                    failure {
-                        updateGitlabCommitStatus name: 'build', state: 'failed'
-                    }
-                    // Only run the steps if the current Pipeline’s or stage’s run has a "aborted" status
-                    aborted {
-                        updateGitlabCommitStatus name: 'build', state: 'canceled'
+            stage ('Scripts') {
+                agent {label 'PREPRO - 70 && QA - 110'}
+                steps {
+                    script {
+                        // Verificamos el BRANCH actual
+                        def BRANCH = sh "git branch"
+                        if (BRANCH != "master"){
+                            echo "NOT MASTER!\nNOT MASTER!"
+                        }
+                        else {
+                            echo "MASTER!\nMASTER!"
+                        }
+                        echo 'Scripts de DB ejecutados con exito'
                     }
                 }
+            }
+
+            stage ('Deploy en Produccion'){
+                agent any
+                steps {
+                    script {
+                        checkout([$class: 'GitSCM',
+                            branches: [[name: "${params.GIT_TAG}"]],
+                            doGenerateSubmoduleConfigurations: false,
+                            extensions: [],
+                            gitTool: 'Default',
+                            submoduleCfg: [],
+                            userRemoteConfigs: [[credentialsId: 'Soligna',
+                            url: 'http://git.snd.int/Soligna/servicios_cmp_backend.git']]])
+                    }
+
+                    // Verificamos que la build sea por un TAG
+                    def tag = sh(returnStdout: true, script: "git tag --contains | head -1").trim()
+                    // Imprimimos valor de var:tag
+                    echo tag
+                    if(tag) {
+                        echo "TAG"
+                        echo "Checking out: ${params.GIT_TAG}"
+
+                        timeout(time:5, unit:'DAYS'){
+                                // Email de solicitud para continuar con el Deploy
+                                mail to: 'nicolas.solignac@sondeos.com.ar',
+                                    from: 'YourFriendlyNeighbourJenkins',
+                                    subject: "Se requiere aprovacion para: ${currentBuild.fullDisplayName}",
+                                    body: "Se requiere aprovacion para proceder con el Deploy de ${currentBuild.fullDisplayName} en ${env.NODE_NAME}.\nAcceder al siguiente link: ${env.RUN_DISPLAY_URL}"
+                                // Pedimos al usuario encargado que valide el Deploy
+                                input message:'Aprobar Deploy en Prod?', submitter: "admin"
+
+                                // Proporcionamos el archivo de configuracion correspondiente al entorno.
+                                configFileProvider([configFile(fileId: '86bf7131-3589-4200-9006-e580514da7ae',
+                                        targetLocation: 'prod_script.sh')]) {
+                                    echo 'Archivo de Deploy copiado en el ambiente'
+                                }
+
+                                // Ejecutamos el script de Deploy
+                                echo "Se comienza el DEPLOY en "+"${env.NODE_NAME}"
+                                sh prod_script.sh
+                                echo "Se finaliza el DEPLOY en "+"${env.NODE_NAME}"
+                        }
+                    }
+                    else {
+                        echo "NO ES TAG"
+                        echo "Se omite el DEPLOY en "+"${env.NODE_NAME}"
+                    }
+                }
+            }
+
+            stage ('Rollbacks'){
+            parallel{
+                  stage ('Rollback QA'){
+                    agent {label 'QA - 110'}
+                    steps{
+                        script{
+                            def proceed = true
+                            try {
+                            timeout(time:5, unit:'DAYS'){
+                                // Email de solicitud para continuar con el Deploy
+                                mail to: 'nicolas.solignac@sondeos.com.ar',
+                                    from: 'YourFriendlyNeighbourJenkins',
+                                    subject: "Se requiere aprovacion para Rollback del Job: ${currentBuild.fullDisplayName}",
+                                    body: "Se requiere aprovacion para proceder con el Rollback de ${currentBuild.fullDisplayName} en ${env.NODE_NAME}.\nAcceder al siguiente link: ${env.RUN_DISPLAY_URL}"
+                                // Pedimos al usuario encargado que valide el Deploy
+                                input message:'Aprobar Rollback del Deploy en QA?', submitter: "admin"}
+                                } catch (err) {
+                                    proceed = false
+                                }
+                                if(proceed) {
+                                    // Proporcionamos el archivo de configuracion correspondiente al entorno.
+                                    configFileProvider([configFile(fileId: '72991f82-89c9-4de5-acad-604534491745',
+                                            targetLocation: 'qa_rl_script.sh')]) {
+                                        echo 'Archivo de Deploy copiado en el ambiente'
+                                    }
+
+                                    // Ejecutamos el script de Rollback
+                                    echo "Se inicia el proceso de Rollback en "+"${env.NODE_NAME}"
+                                    sh qa_rl_script.sh
+                                    echo "Se realizo el Rollback de la version ${params.GIT_TAG}"
+                                }
+                                else {
+                                    echo "Se aborta el proceso de Rollback en "+"${env.NODE_NAME}"
+                                }
+                            }
+                        }
+                    }
+
+                  stage ('Rollback Prod'){
+                    agent any
+                    steps{
+                        script{
+                            def proceed = true
+                            try {
+                            timeout(time:5, unit:'DAYS'){
+                                // Email de solicitud para continuar con el Deploy
+                                mail to: 'nicolas.solignac@sondeos.com.ar',
+                                    from: 'YourFriendlyNeighbourJenkins',
+                                    subject: "Se requiere aprovacion para Rollback del Job: ${currentBuild.fullDisplayName}",
+                                    body: "Se requiere aprovacion para proceder con el Rollback de ${currentBuild.fullDisplayName} en ${env.NODE_NAME}.\nAcceder al siguiente link: ${env.RUN_DISPLAY_URL}"
+                                // Pedimos al usuario encargado que valide el Deploy
+                                input message:'Aprobar Rollback del Deploy en Prod?', submitter: "admin"}
+                                } catch (err) {
+                                    proceed = false
+                                }
+                                if(proceed) {
+                                    // Proporcionamos el archivo de configuracion correspondiente al entorno.
+                                    configFileProvider([configFile(fileId: 'eeca939f-c422-4e2c-aa3a-f801dcbe53ae',
+                                            targetLocation: 'prod_rl_script.sh')]) {
+                                        echo 'Archivo de Deploy copiado en el ambiente'
+                                    }
+
+                                    // Ejecutamos el script de Rollback
+                                    echo "Se inicia el proceso de Rollback en "+"${env.NODE_NAME}"
+                                    sh prod_rl_script.sh
+                                    echo "Se realizo el Rollback de la version ${params.GIT_TAG}"
+                                }
+                                else {
+                                    echo "Se aborta el proceso de Rollback en "+"${env.NODE_NAME}"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+            post {
+                // Run regardless of the completion status of the Pipeline run
+                always {
+                    // Send email
+                    //Email template to be loaded from managed files
+                    emailext body: '${SCRIPT,template="managed:efa4307a-35c9-4249-a55c-7ceb752d8231"}',
+                            attachLog: true,
+                            compressLog: true,
+                            attachmentsPattern: "$reportZipFile",
+                            mimeType: 'text/html',
+                            subject: "Pipeline Exitosa: ${jobName}",
+                            to: "${params.EMAIL_RECIPIENTS}",
+                            replyTo: "${mailRecipients}",
+                            recipientProviders: [[$class: 'CulpritsRecipientProvider']]
+
+                    // Clean up workspace
+                    deleteDir()
+                }
+                // Only run the steps if the current Pipeline’s or stage’s run has a "success" status
+                success {
+                    updateGitlabCommitStatus name: 'build', state: 'success'
+                }
+                // Only run the steps if the current Pipeline’s or stage’s run has a "failure" status
+                failure {
+                    updateGitlabCommitStatus name: 'build', state: 'failed'
+                }
+                // Only run the steps if the current Pipeline’s or stage’s run has a "aborted" status
+                aborted {
+                    updateGitlabCommitStatus name: 'build', state: 'canceled'
+                }
+            }
+        }
+    }
+}

@@ -1,353 +1,636 @@
-def getProjectName() {
-    return 'JenkinsPipeline'
-}
-
-def getJDKVersion() {
-    return 'jdk1.8.0_101'
-}
-
-def getMavenConfig() {
-    return 'maven-config'
-}
-
-def getMavenLocation() {
-    return 'M2_HOME'
-}
-
-def getEnvironment() {
-    return  'QA\n' +
-            'PRE\n' +
-            'PRD'
-}
-
-def getEmailRecipients() {
-    return ''
-}
-
-def getReportZipFile() {
-    return "Reports_Build_${BUILD_NUMBER}.zip"
-}
-
-// AWS S3
-/*def getS3ReportPath() {
-    return "$projectName"
-}*/
-
-def publishHTMLReports(reportName) {
-    // Publish HTML reports (HTML Publisher plugin)
-    publishHTML([allowMissing         : true,
-                 alwaysLinkToLastBuild: true,
-                 keepAll              : true,
-                 reportDir            : 'target\\view',
-                 reportFiles          : 'index.html',
-                 reportName           : reportName])
-}
-
-// To be determined dynamically later
-def EXECUTOR_AGENT=null
-
-/* Declarative pipeline must be enclosed within a pipeline block */
 pipeline {
-    // agent section specifies where the entire Pipeline will execute in the Jenkins environment
-    agent {
-        /**
-         * node allows for additional options to be specified
-         * you can also specify label '' without the node option
-         * if you want to execute the pipeline on any available agent use the option 'agent any'
-         */
-        node {
-            label '' // Execute the Pipeline on an agent available in the Jenkins environment with the provided label
-        }
-    }
-
-    /**
-     * tools to auto-install and put on the PATH
-     * some of the supported tools - maven, jdk, gradle
-     */
-    tools {
-        jdk 'jdk1.7'
-        maven 'mvn3.5.0'
-    }
-
-    /**
-     * parameters directive provides a list of parameters which a user should provide when triggering the Pipeline
-     * some of the valid parameter types are booleanParam, choice, file, text, password, run, or string
-     */
-    parameters {
-        choice(choices: "$environment", description: '', name: 'ENVIRONMENT')
-        string(defaultValue: "$emailRecipients",
-                description: 'List of email recipients',
-                name: 'EMAIL_RECIPIENTS')
-    }
-
-    /**
-     * stages contain one or more stage directives
-     */
-    stages {
-        /**
-         * the stage directive should contain a steps section, an optional agent section, or other stage-specific directives
-         * all of the real work done by a Pipeline will be wrapped in one or more stage directives
-         */
-        stage('Prepare') {
-            steps {
-                // GIT submodule recursive checkout
-                checkout scm: [
-                        $class: 'GitSCM',
-                        branches: scm.branches,
-                        doGenerateSubmoduleConfigurations: false,
-                        extensions: [[$class: 'SubmoduleOption',
-                                      disableSubmodules: false,
-                                      parentCredentials: false,
-                                      recursiveSubmodules: true,
-                                      reference: '',
-                                      trackingSubmodules: false]],
-                        submoduleCfg: [],
-                        userRemoteConfigs: scm.userRemoteConfigs
-                ]
-                // copy managed files to workspace
-                script {
-                    if(params.USE_INPUT_DUNS) {
-                        configFileProvider([configFile(fileId: '609999e4-446c-4705-a024-061ed7ca2a11',
-                                targetLocation: 'input/')]) {
-                            echo 'Managed file copied to workspace'
-                        }
-                    }
-                }
-            }
-        }
-
-        stage('User Input') {
-            // when directive allows the Pipeline to determine whether the stage should be executed depending on the given condition
-            // built-in conditions - branch, expression, allOf, anyOf, not etc.
-            when {
-                // Execute the stage when the specified Groovy expression evaluates to true
-                expression {
-                    return params.ENVIRONMENT ==~ /(?i)(PRE|PRD)/
-                }
-            }
-            /**
-             * steps section defines a series of one or more steps to be executed in a given stage directive
-             */
-            steps {
-                // script step takes a block of Scripted Pipeline and executes that in the Declarative Pipeline
-                script {
-                    // This step pauses Pipeline execution and allows the user to interact and control the flow of the build.
-                    // Only a basic "process" or "abort" option is provided in the stage view
-                    input message: '', ok: 'Proceed',
-                            parameters: [
-                                    string(name: '', description: ''),
-                            ]
-                }
-            }
-        }
-
-        stage('Maven version') {
-            steps {
-                echo "Hello, Maven"
-                sh "mvn --version" // Runs a Bourne shell script, typically on a Unix node
-            }
-        }
-
-        stage('Maven Install') {
-            steps {
-                script {
-                    /**
-                     * Override maven in this stage
-                     * you can also use 'tools {maven: "$mavenLocation"}'
-                     *
-                     * globalMavenSettingsConfig: Select a global maven settings element from File Config Provider
-                     * jdk: Select a JDK installation
-                     * maven: Select a Maven installation
-                     */
-                    withMaven(globalMavenSettingsConfig: "$mavenConfig", jdk: "$JDKVersion", maven: "$mavenLocation") {
-                        /**
-                         * To proceed to the next stage even if the current stage failed,
-                         * enclose this stage in a try-catch block
-                         */
-                        try {
-                            sh "mvn clean install"
-                        } catch (Exception err) {
-                            echo 'Maven clean install failed'
-                            currentBuild.result = 'FAILURE'
-                        } finally {
-                            publishHTMLReports('Reports')
-                        }
-                    }
-                }
-            }
-        }
-
-        stage('Quality Analysis') {
-            steps {
-                /**
-                 * makes use of one single agent, and spins off 2 runs of the steps inside each parallel branch
-                 */
-                parallel(
-                        "Integration Test": {
-                            echo 'Run integration tests'
-                        },
-                        "Sonar Scan": {
-                            sh "mvn sonar:sonar"
-                        }
-                )
-            }
-        }
-
-        stage('Transfer Script') {
-            steps {
-                // provide SSH credentials to builds via a ssh-agent in Jenkins
-                sshagent(['test-key']) {
-                    sh "scp test.sh ${identity}:${path}"
-                }
-            }
-        }
-
-        stage('Execute Script') {
-            steps {
-                script {
-                    // provide SSH credentials to builds via a ssh-agent in Jenkins
-                    sshagent(['test-key']) {
-                        // AWS credentials binding - each binding will define an environment variable active within the scope of the step
-                        withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
-                                          accessKeyVariable: 'AWS_ACCESS_KEY',
-                                          credentialsId: 'test',
-                                          secretKeyVariable: 'AWS_SECRET_KEY']]) {
-                            sh """
-                                ssh ${identity} "chmod 755 test.sh && ./test.sh --aws-access-key ${AWS_ACCESS_KEY} " \
-                                    "--aws-secret-key ${AWS_SECRET_KEY}"
-                            """
-                        }
-                    }
-                }
-            }
-        }
-
-        stage('Determine Agent') {
-            steps {
-                script {
-                    if(params.ENVIRONMENT == 'PRD') {
-                        EXECUTOR_AGENT="prd-jenkins-slave"
-                    } else {
-                        EXECUTOR_AGENT="devops-jenkins-slave"
-                    }
-                }
-                /**
-                 * Saves a set of files for use later in the same build, generally on another node/workspace.
-                 * Stashed files are not otherwise available and are generally discarded at the end of the build.
-                 * Note that the stash and unstash steps are designed for use with small files.
-                 * For large data transfers, use the External Workspace Manager plugin.
-                 */
-                stash 'workspace'
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                /**
-                 * Execute the steps in the dynamically determined node
-                 * We don't use 'agent' here as it won't have access to the script context
-                 * i.e.
-                 * agent {
-                 *     label EXECUTOR_AGENT
-                 * }
-                 * will result in error as EXECUTOR_AGENT will be 'null'
-                 */
-                node(EXECUTOR_AGENT) {
-                    // Restores a set of files previously stashed into the current workspace in a different node
-                    unstash('workspace')
-                    script {
-                        withAWS(profile: 'Deploy-User') {
-                            sh "python deploy.py"
-                        }
-                    }
-                }
-            }
-        }
-
-        stage('Collect Reports') {
-            steps {
-                echo "Reports directory: ${workspace}/target/view"
-                zip dir: "${workspace}/target", zipFile: "$reportZipFile" // Create a zip file of content in the workspace
-            }
-        }
-
-        stage('Archive reports in S3') {
-            steps {
-                // withAWS step provides authorization for the nested steps
-                withAWS(region: 'us-east-1', profile: '') {
-                    // Upload a file/folder from the workspace to an S3 bucket
-                    s3Upload(file: "$reportZipFile",
-                            bucket: '',
-                            path: "$s3ReportPath")
-                }
-            }
-        }
-    }
-
-    /**
-     * post section defines actions which will be run at the end of the Pipeline run or stage
-     * post section condition blocks: always, changed, failure, success, unstable, and aborted
-     */
+    agent none
+    // Actualizamos el estado de la build en la herramienta SCM
     post {
-        // Run regardless of the completion status of the Pipeline run
-        always {
-            // send email
-            // email template to be loaded from managed files
-            emailext body: '${SCRIPT,template="managed:EmailTemplate"}',
-                    attachLog: true,
-                    compressLog: true,
-                    attachmentsPattern: "$reportZipFile",
-                    mimeType: 'text/html',
-                    subject: "Pipeline Build ${BUILD_NUMBER}",
-                    to: "${params.EMAIL_RECIPIENTS}"
-
-            // clean up workspace
-            deleteDir()
-        }
-        // Only run the steps if the current Pipeline’s or stage’s run has a "success" status
         success {
-            script {
-                def payload = """
-{
-    "@type": "MessageCard",
-    "@context": "http://schema.org/extensions",
-    "themeColor": "0076D7",
-    "summary": "Test Message",
-    "sections": [{
-        "activityTitle": "Test Message",
-        "activitySubtitle": "",
-        "activityImage": "https://cwiki.apache.org/confluence/download/attachments/30737784/oozie_47x200.png",
-        "facts": [{
-            "name": "ENVIRONMENT",
-            "value": "${params.ENVIRONMENT}"
-        }],
-        "markdown": true
-    }],
-    "potentialAction": [{
-        "@type": "OpenUri",
-        "name": "View Build",
-        "targets": [
-            { "os": "default", "uri": "${BUILD_URL}" }
-        ]
-    }]
-}"""
-                // publish message to webhook
-                httpRequest httpMode: 'POST',
-                        acceptType: 'APPLICATION_JSON',
-                        contentType: 'APPLICATION_JSON',
-                        url: "${webhookUrl}",
-                        requestBody: payload
+            updateGitlabCommitStatus name: 'build', state: 'success'
+        }
+        failure {
+            updateGitlabCommitStatus name: 'build', state: 'failed'
+        }
+        aborted {
+            updateGitlabCommitStatus name: 'build', state: 'canceled'
+        }
+    }
+
+    options {
+        // Definimos la herramienta SCM a utilizar (Previamente configurada en el Admin del Master de Jenkins)
+        gitLabConnection('GitLab Sondeos')
+        // Desactivamos el Checkout default ya que puede causar que no tome los commits
+        skipDefaultCheckout(true)
+    }
+
+    triggers {
+        // Definimos que tipo de evento en la SCM desata la build del proyecto
+        gitlab(triggerOnPush: true, triggerOnMergeRequest: true, branchFilterType: 'All')
+    }
+
+    parameters {
+        // Parametros de TAG en Git
+        gitParameter name: 'GIT_TAG',
+                     type: 'PT_TAG',
+                     defaultValue: 'origin/master'
+    }
+
+    stages{
+        stage('Build'){
+            agent {
+                docker {
+                    image 'maven:3-alpine'
+                    args '-v /jenkins/.m2:/jenkins/.m2'
+                }
+            }
+            steps {
+                // Checkout con los ultimos cambios (incluyendo los commits)
+                checkout scm
+                sh 'mvn install package -e -X -Dmaven.test.skip=true'
+            }
+            post {
+                success {
+                    // Guardamos los binarios en el agente Master
+                    echo 'Archivando binarios...'
+                    archiveArtifacts artifacts: '**/target/*.jar'
+                }
             }
         }
-    }
 
-    // configure Pipeline-specific options
-    options {
-        // keep only last 10 builds
-        buildDiscarder(logRotator(numToKeepStr: '10'))
-        // timeout job after 60 minutes
-        timeout(time: 60,
-                unit: 'MINUTES')
-    }
+        stage ('Analysis') {
+            agent {
+                docker {
+                    image 'maven:3-alpine'
+                    args '-v /jenkins/.m2:/jenkins/.m2'
+                }
+            }
+            steps{
+                // Checkout con los ultimos cambios (incluyendo los commits)
+                checkout scm
+                sh "mvn -batch-mode -V -U -e checkstyle:checkstyle pmd:pmd findbugs:findbugs" //"sonar:sonar"
 
+                // Realizamos el analisis estatico del codigo
+                step([$class: 'hudson.plugins.checkstyle.CheckStylePublisher', pattern: '**/target/checkstyle-result.xml'])
+                step([$class: 'PmdPublisher', pattern: '**/target/pmd.xml'])
+                step([$class: 'FindBugsPublisher', pattern: '**/findbugsXml.xml'])
+            }
+        }
+
+        stage ('Test') {
+            agent {
+                docker {
+                    image 'maven:3-alpine'
+                    args '-v /jenkins/.m2:/jenkins/.m2'
+                }
+            }
+
+            steps{
+                // Checkout con los ultimos cambios (incluyendo los commits)
+                checkout scm
+                // Corremos los tests
+                sh "mvn test"
+                // Archivamos los resultados y los publicamos
+                step([$class: 'JUnitResultArchiver', testResults: '**/target/surefire-reports/*.xml', healthScaleFactor: 1.0])
+            }
+        }
+
+        stage ('Deployments'){
+            parallel{
+                stage ('Deploy en Desa'){
+                    agent {label 'PREPRO - 70'}
+                    steps {
+                        // Checkout con los ultimos cambios
+                        checkout scm
+                        echo "Se comienza el DEPLOY en "+"${env.NODE_NAME}"
+
+                        // Deploy script
+                        sh '''
+
+                        # Definimos la ruta de trabajo
+                        ROOTDIR="/usr/CMP/servicios_cmp_backend"
+
+                        # Limpiamos la carpeta de los binarios obsoletos
+                        cd $ROOTDIR
+                        rm *.jar_* || true
+
+                        # Guardamos el nombre del archivo de BACKUP
+                        FILENAME=servicios_cmp_backend.jar
+
+                        # Realizo el BACKUP
+                        cp ${FILENAME} ${FILENAME}_$(date +%d-%m-%Y) || true
+
+                        # DEPLOY
+                        echo "Se comienza con el DEPLOY"
+                        cp ${WORKSPACE}/target/*.jar $FILENAME && echo "Se realizo el DEPLOY"
+
+                        # Artifact permisos
+                        echo "Actualizamos los permisos"
+                        chown --reference *.jar_$(date +%d-%m-%Y) $FILENAME
+                        chmod --reference *.jar_$(date +%d-%m-%Y) $FILENAME
+
+                        # Variable API
+                        API="servicios-cmp-backend"
+
+                        # Control del servicio
+                        echo "Reiniciando el servicio"
+                        /usr/sbin/service $API stop || true
+                        /usr/sbin/service $API status
+                        sleep 1
+                        /usr/sbin/service $API start
+                        # Verificamos que el servicio esta corriendo
+                        ps aux | grep -v grep | grep $FILENAME
+                        '''
+                        echo "Se finaliza el DEPLOY en "+"${env.NODE_NAME}"
+                    }
+                }
+
+                stage ('Deploy en QA'){
+                    agent {label 'QA - 110'}
+                    steps{
+                        script {
+                          // Chequeamos que el repositorio esta inicializado.
+                          def initialized = sh(returnStdout: true, script: "git rev-parse --is-inside-work-tree").trim()
+                          def configured = sh(returnStdout: true, script: "git tag").trim()
+                          // Lo inicializamos en caso de que no lo este
+                          if (!initialized || configured.empty){
+                              checkout scm
+                          }
+                          else {
+                              // Checkout utilizando el parametro que contiene el ID del TAG
+                              checkout([$class: 'GitSCM',
+                                    branches: [[name: "${params.GIT_TAG}"]],
+                                    doGenerateSubmoduleConfigurations: false,
+                                    extensions: [],
+                                    gitTool: 'Default',
+                                    submoduleCfg: [],
+                              ])
+                          }
+
+                            // Verificamos que la Build sea por un TAG
+                            def tag = sh(returnStdout: true, script: "git tag --contains | head -1").trim()
+                            echo tag
+                            if (tag) {
+                                echo "ES TAG"
+                                echo "Checking out: ${params.GIT_TAG}"
+
+                                timeout(time:5, unit:'DAYS'){
+                                    // Email de solicitud para continuar con el Deploy
+                                    mail to: 'nicolas.solignac@sondeos.com.ar',
+                                        from: 'YourFriendlyNeighbourJenkins',
+                                        subject: "Se requiere aprovacion para: ${currentBuild.fullDisplayName}",
+                                        body: "Se requiere aprovacion para proceder con el Deploy de ${currentBuild.fullDisplayName} en ${env.NODE_NAME}.\nAcceder al siguiente link: ${env.RUN_DISPLAY_URL}"
+                                    // Pedimos al usuario encargado que valide el Deploy
+                                    input message:'Aprobar Deploy en Prod?', submitter: "admin"
+
+                                    // Imprimimos el nombre y mail del usuario que inicio el build
+                                    wrap([$class: 'BuildUser']) {
+                                    echo "Usuario: "+"${env.BUILD_USER}\nDireccion de email: "+"${env.BUILD_USER_EMAIL}"
+                                    }
+
+                                    script {
+                                        // Proporcionamos el archivo de configuracion correspondiente al entorno.
+                                        /*configFileProvider(
+                                            [configFile(fileId: 'qa-settings', variable: 'QA_SETTINGS', targetLocation: 'qa_settings')]) {
+                                        }*/
+
+                                        if (currentBuild.currentResult == 'SUCCESS') {
+                                            // Deploy
+                                            echo "Se comienza el DEPLOY en "+"${env.NODE_NAME}"
+                                            // DEPLOY SCRIPT
+                                            sh '''
+                                            # Definimos la ruta de trabajo
+                                            ROOTDIR="/appuser/serviciosCmpBackend"
+
+                                            # Limpiamos la carpeta de los binarios obsoletos
+                                            cd $ROOTDIR
+                                            rm *.jar_* || true
+
+                                            # Guardamos el nombre del archivo de BACKUP
+                                            FILENAME=servicios_cmp_backend.jar
+
+                                            # Realizo el BACKUP
+                                            cp ${FILENAME} ${FILENAME}_$(date +%d-%m-%Y) || true
+
+                                            # DEPLOY
+                                            echo "Se comienza con el DEPLOY"
+                                            cp ${WORKSPACE}/target/*.jar $FILENAME && echo "Se realizo el DEPLOY"
+
+                                            # Artifact permisos
+                                            echo "Actualizamos los permisos"
+                                            chown --reference *.jar_$(date +%d-%m-%Y) $FILENAME
+                                            chmod --reference *.jar_$(date +%d-%m-%Y) $FILENAME
+
+                                            # Variable API
+                                            API="servicios-cmp-backend"
+
+                                            # Control del servicio
+                                            echo "Reiniciando el servicio"
+                                            /usr/sbin/service $API stop || true
+                                            /usr/sbin/service $API status
+                                            sleep 1
+                                            sudo /usr/sbin/service $API start
+                                            # Verificamos que el servicio esta corriendo
+                                            ps aux | grep -v grep | grep -i $FILENAME
+
+                                            '''
+                                            echo "Se finaliza el DEPLOY en "+"${env.NODE_NAME}"+" de la version "+"${GIT_TAG}"
+                                            echo "Resultado de la build: ${currentBuild.currentResult}"
+                                        }
+                                    }
+                                }
+                            }
+                            else {
+                                echo "NO ES TAG"
+                                echo "Se omite el Deploy"
+                            }
+                        }
+                    }
+
+                    // Email informando el resultado del Deploy en el ambiente
+                    post {
+                        success {
+                            script {
+                                echo 'Cambios implementados en '+"${env.NODE_NAME}"
+
+                                // Enviamos mail informando los resultados y adjuntamos archivos relevantes
+                                // MAIL
+                                def mailRecipients = "nicolas.solignac@sondeos.com.ar"
+                                def myProviders = [ [$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider'] ];
+                                myProviders.add ( [$class: 'RequesterRecipientProvider'] );
+
+                                def jobName = currentBuild.fullDisplayName
+
+                                // Agregamos el log al mail
+                                emailext attachLog: true,
+                                    //body: '''${SCRIPT, template="groovy-html.template"}''',
+                                    body: '''${JELLY_SCRIPT,template="static-analysis"}''',
+                                    compressLog: true,
+                                    mimeType: 'text/html',
+                                    subject: "Pipeline Exitosa: ${jobName}",
+                                    to: "${mailRecipients}",
+                                    replyTo: "${mailRecipients}",
+                                    recipientProviders: [[$class: 'CulpritsRecipientProvider']]
+                            }
+                        }
+
+                        failure {
+                            script {
+                                echo 'Deploy fallido en '+"${env.NODE_NAME}"
+
+                                // MAIL
+                                def mailRecipients = "nicolas.solignac@sondeos.com.ar"
+                                def myProviders = [ [$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider'] ];
+                                myProviders.add ( [$class: 'RequesterRecipientProvider'] );
+
+                                def jobName = currentBuild.fullDisplayName
+
+                                emailext attachLog: true,
+                                    //body: '''${SCRIPT, template="groovy-html.template"}''',
+                                    body: '''${JELLY_SCRIPT,template="static-analysis"}''',
+                                    compressLog: true,
+                                    mimeType: 'text/html',
+                                    subject: "Pipeline Fallida: ${jobName}",
+                                    to: "${mailRecipients}",
+                                    replyTo: "${mailRecipients}",
+                                    recipientProviders: [[$class: 'CulpritsRecipientProvider']]
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        stage ('Scripts') {
+            agent {label 'QA - 110'}
+            //agent any
+            steps {
+                script {
+                    // Multibranch only
+                    /*echo "${env.BRANCH_NAME}"
+                    if ("${env.BRANCH_NAME}" == "master"){
+                        echo "MASTER! MASTER!"
+                    }*/
+
+                    // Verificamos el BRANCH actual
+                    def BRANCH = sh "git branch"
+                    if (BRANCH != "master"){
+                        echo "NOT MASTER!\nNOT MASTER!"
+                    }
+                    else {
+                        echo "MASTER!\nMASTER!"
+                    }
+                    sh "echo 'Scripts de DB ejecutados con exito'"
+                }
+            }
+        }
+
+        stage ('Deploy en Produccion'){
+            agent any
+            steps{
+                script {
+                  // Chequeamos que el repositorio esta inicializado
+                  def initialized = sh(returnStdout: true, script: "git rev-parse --is-inside-work-tree").trim()
+                  def configured = sh(returnStdout: true, script: "git tag").trim()
+                  // Lo inicializamos en caso de que no lo este
+                  if (!initialized || configured.empty){
+                      checkout scm
+                  }
+                  else {
+                      // Checkout utilizando el parametro que contiene el ID del TAG
+                      checkout([$class: 'GitSCM',
+                            branches: [[name: "${params.GIT_TAG}"]],
+                            doGenerateSubmoduleConfigurations: false,
+                            extensions: [],
+                            gitTool: 'Default',
+                            submoduleCfg: [],
+                      ])
+                  }
+
+                    // Verificamos que la Build sea por un TAG.
+                    def tag = sh(returnStdout: true, script: "git tag --contains | head -1").trim()
+                    echo tag
+                    if (tag) {
+                        echo "ES TAG"
+                        echo "Checking out: ${params.GIT_TAG}"
+
+                        timeout(time:5, unit:'DAYS'){
+                            // Email de solicitud para continuar con el Deploy
+                            mail to: 'nicolas.solignac@sondeos.com.ar',
+                                from: 'YourFriendlyNeighbourJenkins',
+                                subject: "Se requiere aprovacion para: ${currentBuild.fullDisplayName}",
+                                body: "Se requiere aprovacion para proceder con el Deploy de ${currentBuild.fullDisplayName} en ${env.NODE_NAME}.\nAcceder al siguiente link: ${env.RUN_DISPLAY_URL}"
+                            // Pedimos al usuario encargado que valide el Deploy
+                            input message:'Aprobar Deploy en Prod?', submitter: "admin"
+
+                            // Imprimimos el nombre y mail del usuario que inicio el build
+                            wrap([$class: 'BuildUser']) {
+                            echo "Usuario: "+"${env.BUILD_USER}\nDireccion de email: "+"${env.BUILD_USER_EMAIL}"
+                            }
+
+                            script {
+                                // Proporcionamos el archivo de configuracion correspondiente al entorno
+                                /*configFileProvider(
+                                    [configFile(fileId: 'prod-settings', variable: 'PROD_SETTINGS', targetLocation: 'prod_settings')]) {
+                                }*/
+
+                                if (currentBuild.currentResult == 'SUCCESS') {
+                                    // Deploy
+                                    echo "Se comienza el DEPLOY en "+"${env.NODE_NAME}"
+                                    // DEPLOY SCRIPT
+                                    /*sh '''
+
+                                    # Definimos la ruta de trabajo
+                                    ROOTDIR="/usr/CMP/servicios_cmp_backend"
+
+                                    # Limpiamos la carpeta de los binarios obsoletos
+                                    cd $ROOTDIR
+                                    rm *.jar_* || true
+
+                                    # Guardamos el nombre del archivo de BACKUP
+                                    FILENAME=servicios_cmp_backend.jar
+
+                                    # Realizo el BACKUP
+                                    cp ${FILENAME} ${FILENAME}_$(date +%d-%m-%Y) || true
+
+                                    # DEPLOY
+                                    echo "Se comienza con el DEPLOY"
+                                    cp ${WORKSPACE}/target/*.jar $FILENAME && echo "Se realizo el DEPLOY"
+
+                                    # Artifact permisos
+                                    echo "Actualizamos los permisos"
+                                    chown --reference *.jar_$(date +%d-%m-%Y) $FILENAME
+                                    chmod --reference *.jar_$(date +%d-%m-%Y) $FILENAME
+
+                                    # Variable API
+                                    API="servicios-cmp-backend"
+
+                                    # Control del servicio
+                                    echo "Reiniciando el servicio"
+                                    /usr/sbin/service $API stop || true
+                                    sleep 1
+                                    /usr/sbin/service $API start
+                                    ps aux | grep -v grep | grep $FILENAME
+
+                                    '''*/
+                                    echo "Se finaliza el DEPLOY en "+"${env.NODE_NAME}"+" de la version "+"${GIT_TAG}"
+                                    echo "Resultado de la build: ${currentBuild.currentResult}"
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        echo "NO ES TAG"
+                        echo "Se omite el Deploy"
+                    }
+                }
+            }
+
+            /*post {
+                success {
+                    script {
+                        echo 'Cambios implementados en '+"${env.NODE_NAME}"
+
+                        // MAIL
+                        def mailRecipients = "nicolas.solignac@sondeos.com.ar"
+                        def myProviders = [ [$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider'] ];
+                        myProviders.add ( [$class: 'RequesterRecipientProvider'] );
+
+                        def jobName = currentBuild.fullDisplayName
+
+                        emailext attachLog: true,
+                            //body: '''${SCRIPT, template="groovy-html.template"}''',
+                            body: '''${JELLY_SCRIPT,template="JenkinsHtmlEmail"}''',
+                            compressLog: true,
+                            mimeType: 'text/html',
+                            subject: "Pipeline Fallida: ${jobName}",
+                            to: "${mailRecipients}",
+                            replyTo: "${mailRecipients}",
+                            recipientProviders: [[$class: 'CulpritsRecipientProvider']]
+                    }
+                }
+
+                failure {
+                    script {
+                        echo 'Deploy fallido en '+"${env.NODE_NAME}"
+
+                        // MAIL
+                        def mailRecipients = "nicolas.solignac@sondeos.com.ar"
+                        def myProviders = [ [$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider'] ];
+                        myProviders.add ( [$class: 'RequesterRecipientProvider'] );
+
+                        def jobName = currentBuild.fullDisplayName
+
+                        emailext attachLog: true,
+                            //body: '''${SCRIPT, template="groovy-html.template"}''',
+                            body: '''${JELLY_SCRIPT,template="JenkinsHtmlEmail"}''',
+                            compressLog: true,
+                            mimeType: 'text/html',
+                            subject: "Pipeline Fallida: ${jobName}",
+                            to: "${mailRecipients}",
+                            replyTo: "${mailRecipients}",
+                            recipientProviders: [[$class: 'CulpritsRecipientProvider']]
+                    }
+                }
+            }*/
+        }
+
+        stage ('Rollbacks'){
+            parallel{
+              stage ('Rollback QA'){
+                agent {label 'QA - 110'}
+                steps{
+                    script{
+                        def proceed = true
+                        try {
+                        timeout(time:5, unit:'DAYS'){
+                            // Email de solicitud para continuar con el Deploy
+                            mail to: 'nicolas.solignac@sondeos.com.ar',
+                                from: 'YourFriendlyNeighbourJenkins',
+                                subject: "Se requiere aprovacion para Rollback del Job: ${currentBuild.fullDisplayName}",
+                                body: "Se requiere aprovacion para proceder con el Rollback de ${currentBuild.fullDisplayName} en ${env.NODE_NAME}.\nAcceder al siguiente link: ${env.RUN_DISPLAY_URL}"
+                            // Pedimos al usuario encargado que valide el Deploy
+                            input message:'Aprobar Rollback del Deploy en QA?', submitter: "admin"}
+                            } catch (err) {
+                                proceed = false
+                            }
+                            if(proceed) {
+                                echo "Se inicia el proceso de Rollback en "+"${env.NODE_NAME}"
+                                // Script rollback
+                                /*sh '''
+
+                                # Definimos la ruta de trabajo
+                                ROOTDIR="/usr/CMP/servicios_cmp_backend"
+
+                                # Limpiamos la carpeta de los binarios obsoletos
+                                cd $ROOTDIR
+                                rm *.jar_* || true
+
+                                # Guardamos el nombre del archivo de BACKUP
+                                FILENAME=servicios_cmp_backend.jar
+
+                                # Realizo el BACKUP
+                                cp ${FILENAME} ${FILENAME}_$(date +%d-%m-%Y) || true
+
+                                # DEPLOY
+                                echo "Se comienza con el DEPLOY"
+                                cp ${WORKSPACE}/target/*.jar $FILENAME && echo "Se realizo el DEPLOY"
+
+                                # Artifact permisos
+                                echo "Actualizamos los permisos"
+                                chown --reference *.jar_$(date +%d-%m-%Y) $FILENAME
+                                chmod --reference *.jar_$(date +%d-%m-%Y) $FILENAME
+
+                                # Variable API
+                                API="servicios-cmp-backend"
+
+                                # Control del servicio
+                                echo "Reiniciando el servicio"
+                                /usr/sbin/service $API stop || true
+                                sleep 3
+                                /usr/sbin/service $API start
+                                ps aux | grep -v grep | grep $FILENAME
+
+                                # Verificamos que el servicio esta corriendo
+                                if systemctl is-active --quiet $API.service == 0; then
+                                  true
+                                else
+                                  # Realizamos el Rollback
+                                  cp ${FILENAME}_$(date +%d-%m-%Y) ${FILENAME}
+
+                                  # Reiniciamos el servicio
+                                 echo "Reiniciando el servicio"
+                                 /usr/sbin/service $API stop || true
+                                 sleep 3
+                                 /usr/sbin/service $API start
+                                 ps aux | grep -v grep | grep $FILENAME
+
+                                '''*/
+                                echo "Se realizo el Rollback de la version ${params.GIT_TAG}"
+                                echo "WARNING: Resultado de la build: ${currentBuild.currentResult}"
+                            }
+                            else {
+                                echo "Se aborta el proceso de Rollback en "+"${env.NODE_NAME}"
+                            }
+                    }
+                }
+            }
+
+              stage ('Rollback Prod'){
+                agent any
+                steps{
+                    script{
+                        def proceed = true
+                        try {
+                        timeout(time:5, unit:'DAYS'){
+                            // Email de solicitud para continuar con el Deploy
+                            mail to: 'nicolas.solignac@sondeos.com.ar',
+                                from: 'YourFriendlyNeighbourJenkins',
+                                subject: "Se requiere aprovacion para Rollback del Job: ${currentBuild.fullDisplayName}",
+                                body: "Se requiere aprovacion para proceder con el Rollback de ${currentBuild.fullDisplayName} en ${env.NODE_NAME}.\nAcceder al siguiente link: ${env.RUN_DISPLAY_URL}"
+                            // Pedimos al usuario encargado que valide el Deploy
+                            input message:'Aprobar Rollback del Deploy en Prod?', submitter: "admin"}
+                            } catch (err) {
+                                proceed = false
+                            }
+                            if(proceed) {
+                                echo "Se inicia el proceso de Rollback en "+"${env.NODE_NAME}"
+                                // Script rollback
+                                /*sh '''
+
+                                # Definimos la ruta de trabajo
+                                ROOTDIR="/usr/CMP/servicios_cmp_backend"
+
+                                # Limpiamos la carpeta de los binarios obsoletos
+                                cd $ROOTDIR
+                                rm *.jar_* || true
+
+                                # Guardamos el nombre del archivo de BACKUP
+                                FILENAME=servicios_cmp_backend.jar
+
+                                # Realizo el BACKUP
+                                cp ${FILENAME} ${FILENAME}_$(date +%d-%m-%Y) || true
+
+                                # DEPLOY
+                                echo "Se comienza con el DEPLOY"
+                                cp ${WORKSPACE}/target/*.jar $FILENAME && echo "Se realizo el DEPLOY"
+
+                                # Artifact permisos
+                                echo "Actualizamos los permisos"
+                                chown --reference *.jar_$(date +%d-%m-%Y) $FILENAME
+                                chmod --reference *.jar_$(date +%d-%m-%Y) $FILENAME
+
+                                # Variable API
+                                API="servicios-cmp-backend"
+
+                                # Control del servicio
+                                echo "Reiniciando el servicio"
+                                /usr/sbin/service $API stop || true
+                                sleep 3
+                                /usr/sbin/service $API start
+                                ps aux | grep -v grep | grep $FILENAME
+
+                                # Verificamos que el servicio esta corriendo
+                                if systemctl is-active --quiet $API.service == 0; then
+                                  true
+                                else
+                                  # Realizamos el Rollback
+                                  cp ${FILENAME}_$(date +%d-%m-%Y) ${FILENAME}
+
+                                  # Reiniciamos el servicio
+                                 echo "Reiniciando el servicio"
+                                 /usr/sbin/service $API stop || true
+                                 sleep 3
+                                 /usr/sbin/service $API start
+                                 ps aux | grep -v grep | grep $FILENAME
+
+                                '''*/
+                                echo "Se realizo el Rollback de la version ${params.GIT_TAG}"
+                                echo "WARNING: Resultado de la build: ${currentBuild.currentResult}"
+                            }
+                            else {
+                                echo "Se aborta el proceso de Rollback en "+"${env.NODE_NAME}"
+                            }
+                    }
+                }
+              }
+        }
+    }
+  }
 }

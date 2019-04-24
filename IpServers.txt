@@ -45,7 +45,7 @@ Server's IP:
 
 - Redmine Vicente Lopez - Visados
 	192.168.34.141
-  192.168.34.144
+  192.168.34.144 - WS Visados
 
 
 - Multichannel (web)

@@ -2,9 +2,6 @@
 Server's IP:
 ============
 
-- Dynform2.0 (API, Web, LaravelCron??)
-  	192.168.34.108
-
 - ASTERISK
  - Axion Energy SA
    192.168.9.131
@@ -42,7 +39,7 @@ Server's IP:
 - Multichannel Multic (API) y Topic Service
   192.168.33.187
 
-- Redmines Vicente Lopez
+- Redmines Vicente Lopez - Denuncias
 	192.168.34.140
 
 
@@ -52,8 +49,8 @@ Server's IP:
 
 
 - Multichannel (web)
-- Dynform vlopezweb
-- Dynform vlopezapi
+- Dynform - /var/www/vlopezweb
+- Dynform - /var/www/vlopezapi
 - CMP Web
 	192.168.35.112 - cmpw
 
@@ -172,9 +169,6 @@ Server's IP:
 
 - DB Mongo Celulares / Scripts / Number-Land
   192.168.33.113
-
-- Redmine Visados DB
-  192.168.34.141
 
 - Procesador de audio CMP
   192.168.33.117

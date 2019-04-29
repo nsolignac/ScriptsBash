@@ -175,3 +175,6 @@ Server's IP:
 
 - Redeterminaciones Vlopez
   192.168.34.127
+
+- Inet QA
+  192.168.20.108

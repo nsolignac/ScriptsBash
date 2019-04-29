@@ -177,4 +177,4 @@ Server's IP:
   192.168.34.127
 
 - Inet QA
-  192.168.20.108
+  192.168.20.108 - URL: http://mantis.sondeosglobal.com/view.php?id=70753

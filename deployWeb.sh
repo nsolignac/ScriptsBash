@@ -1,5 +1,6 @@
 # RUTAS DE TRABAJO
 ROOTDIR="/var/www/multichannelWeb"
+# TODO: Reemplazar con variable de JENKINS
 PROJECTNAME="mc-web"
 
 # LIMPIEZA

@@ -178,3 +178,6 @@ Server's IP:
 
 - Inet QA
   192.168.20.108 - URL: http://inet.snd.int/user/login
+
+- Dynform INET QA (Web y API)
+  192.168.20.105

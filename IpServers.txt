@@ -181,3 +181,6 @@ Server's IP:
 
 - Dynform INET QA (Web y API)
   192.168.20.105
+
+- Topic Service QA
+	192.168.20.101

@@ -52,6 +52,8 @@ Server's IP:
 - Dynform - /var/www/vlopezweb
 - Dynform - /var/www/vlopezapi
 - CMP Web
+- INET Dynform API
+- INET Dynform Web
 	192.168.35.112 - cmpw
 
 

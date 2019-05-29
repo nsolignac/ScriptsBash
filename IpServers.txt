@@ -54,11 +54,14 @@ Server's IP:
 - CMP Web
 - INET Dynform API
 - INET Dynform Web
+- Chip Mail Web
 	192.168.35.112 - cmpw
 
 
 - Vlopez Scripts
-- Chip Mail
+- Chip Mail Script
+- Chip Mail Cron
+- Chip Mail API
 	192.168.9.92 - vls
 
 

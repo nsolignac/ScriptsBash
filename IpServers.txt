@@ -58,6 +58,7 @@ Server's IP:
 
 
 - Vlopez Scripts
+- Chip Mail
 	192.168.9.92 - vls
 
 

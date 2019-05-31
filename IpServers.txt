@@ -54,7 +54,6 @@ Server's IP:
 - CMP Web
 - INET Dynform API
 - INET Dynform Web
-- Chip Mail Web
 	192.168.35.112 - cmpw
 
 
@@ -190,3 +189,6 @@ Server's IP:
 
 - Topic Service QA
 	192.168.20.101
+
+- Chip Mail Web
+  192.168.35.131

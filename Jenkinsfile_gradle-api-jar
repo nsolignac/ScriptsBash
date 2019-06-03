@@ -89,12 +89,12 @@ pipeline {
 
                         if(isPre) {
                             configFileProvider([configFile(fileId: '29812639-10d6-411c-85f9-5dd08e8d2b48',
-                                    targetLocation: 'DeployJar.sh')]) {
+                                    targetLocation: 'DeployMCAPI.sh')]) {
                                 echo 'Archivo de Deploy copiado en el ambiente'
                             }
 
                             echo "Se comienza el DEPLOY en "+"${env.NODE_NAME}"
-                            //sh '/bin/bash '+'DeployJar.sh'
+                            //sh '/bin/bash '+'DeployMCAPI.sh'
                             echo "Se finaliza el DEPLOY en "+"${env.NODE_NAME}"
                         }
                     }
@@ -117,12 +117,12 @@ pipeline {
                                         input message:'Aprobar Deploy en QA?', submitter: "admin"
 
                                         configFileProvider([configFile(fileId: '29812639-10d6-411c-85f9-5dd08e8d2b48',
-                                                targetLocation: 'DeployJar.sh')]) {
+                                                targetLocation: 'DeployMCAPI.sh')]) {
                                             echo 'Archivo de Deploy copiado en el ambiente'
                                         }
 
                                         echo "Se comienza el DEPLOY en "+"${env.NODE_NAME}"
-                                        //sh '/bin/bash '+'DeployJar.sh'
+                                        //sh '/bin/bash '+'DeployMCAPI.sh'
                                         echo "Se finaliza el DEPLOY en "+"${env.NODE_NAME}"
                                 }
                             }

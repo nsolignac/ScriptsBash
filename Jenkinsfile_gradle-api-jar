@@ -1,0 +1,138 @@
+#!groovy
+
+def getProjectName() {
+    return 'mc-api-test'
+}
+
+def getEmailRecipients() {
+    return 'nicolas.solignac@sondeos.com.ar'
+}
+
+def URL='http://git.snd.int/jenkins/api.git'
+
+pipeline {
+    /*agent {
+        node {
+            label ''
+        }
+    }*/
+
+    post {
+        always {
+            emailext body: '''${JELLY_SCRIPT,template="static-analysis"}''',
+                    attachmentsPattern: 'inputBox.txt',
+                    attachLog: true,
+                    compressLog: true,
+                    mimeType: 'text/html',
+                    subject: "Pipeline Finalizada: ${currentBuild.fullDisplayName}",
+                    to: "${params.EMAIL_RECIPIENTS}",
+                    recipientProviders: [[$class: 'CulpritsRecipientProvider']]
+
+
+        }
+        success {
+            updateGitlabCommitStatus name: 'build', state: 'success'
+        }
+        failure {
+            updateGitlabCommitStatus name: 'build', state: 'failed'
+        }
+        aborted {
+            updateGitlabCommitStatus name: 'build', state: 'canceled'
+        }
+        cleanup {
+            cleanWs(disableDeferredWipeout: false, deleteDirs: true)
+        }
+    }
+
+    options {
+        gitLabConnection('GitLab Sondeos')
+        skipDefaultCheckout(true)
+    }
+
+    triggers {
+        gitlab(triggerOnPush: true, triggerOnMergeRequest: false, branchFilterType: 'All')
+    }
+
+    parameters {
+        string(defaultValue: "$emailRecipients", description: 'List of email recipients', name: 'EMAIL_RECIPIENTS')
+        gitParameter name: 'GIT_TAG', type: 'PT_TAG', defaultValue: 'origin/master'
+    }
+
+    stages {
+        stage('Build'){
+            agent {label 'PREPRO - 74' && label 'QA - 110'}
+            steps {
+                checkout([$class: 'GitSCM',
+                    branches: [[name: "${params.GIT_TAG}"]],
+                    doGenerateSubmoduleConfigurations: false,
+                    extensions: [[$class: 'LocalBranch', localBranch: "${params.GIT_TAG}"]],
+                    submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'Soligna',
+                    url: URL]]])
+
+                sh './grailsw clean && ./grailsw -Dgrails.env=integration package'
+            }
+            post {
+                success {
+                    // Guardamos los binarios en el agente.
+                    echo 'Archivando binarios...'
+                    archiveArtifacts artifacts: '**/build/libs/*.jar'
+                }
+            }
+        }
+
+        stage ('Deployments'){
+            parallel{
+                stage ('Deploy en Desa'){
+                    agent {label 'PREPRO - 74'}
+                    steps {
+                        def isPre = {"${params.GIT_TAG}" == "origin/master"}
+
+                        if(isPre) {
+                            configFileProvider([configFile(fileId: '29812639-10d6-411c-85f9-5dd08e8d2b48',
+                                    targetLocation: 'DeployJar.sh')]) {
+                                echo 'Archivo de Deploy copiado en el ambiente'
+                            }
+
+                            echo "Se comienza el DEPLOY en "+"${env.NODE_NAME}"
+                            //sh '/bin/bash '+'DeployJar.sh'
+                            echo "Se finaliza el DEPLOY en "+"${env.NODE_NAME}"
+                        }
+                    }
+                }
+
+                stage ('Deploy en QA'){
+                    agent {label 'QA - 101'}
+                    steps {
+                        script {
+                            def tag = sh(returnStdout: true, script: "git tag --contains | head -1").trim()
+                            def isQA = "${params.GIT_TAG}".contains("q") || tag.contains("q")
+
+                            if(isQA) {
+                                timeout(time:5, unit:'DAYS'){
+                                        mail to: "${params.EMAIL_RECIPIENTS}",
+                                            from: 'YourFriendlyNeighbourJenkins',
+                                            subject: "Se requiere aprovacion para: ${currentBuild.fullDisplayName}",
+                                            body: "Se requiere aprovacion para proceder con el Deploy de ${currentBuild.fullDisplayName} en ${env.NODE_NAME}.\nAcceder al siguiente link: ${env.RUN_DISPLAY_URL}"
+
+                                        input message:'Aprobar Deploy en QA?', submitter: "admin"
+
+                                        configFileProvider([configFile(fileId: '29812639-10d6-411c-85f9-5dd08e8d2b48',
+                                                targetLocation: 'DeployJar.sh')]) {
+                                            echo 'Archivo de Deploy copiado en el ambiente'
+                                        }
+
+                                        echo "Se comienza el DEPLOY en "+"${env.NODE_NAME}"
+                                        //sh '/bin/bash '+'DeployJar.sh'
+                                        echo "Se finaliza el DEPLOY en "+"${env.NODE_NAME}"
+                                }
+                            }
+                            else {
+                                echo "Se omite el DEPLOY en "+"${env.NODE_NAME}"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,57 +1,33 @@
-#sh '''
+#!/bin/bash
 
 #Definimos la ruta de trabajo
-ROOTDIR="/usr/CMP/servicios_cmp_backend"
+ROOTDIR="/appuser/multichannel"
 
-#Limpiamos la carpeta de los binarios obsoletos // TODO
-#rm *.jar
+#Limpiamos la carpeta de los binarios obsoletos
 cd $ROOTDIR
-
-echo "DONDE ESTOY?"
-echo ${WORKSPACE}
-pwd
 rm *.jar_* || true
+rm nohup.bkp || true
 
 #Guardamos el nombre del archivo de BACKUP
-#FILENAME=$(ls . | grep -i "servicios_cmp_backend" | cut -d '-' -f 1 | sort -u)
-FILENAME=servicios_cmp_backend.jar
+FILENAME=$(ls . | grep -i "multichannel" | cut -d '-' -f 1 | sort -u)
 echo $FILENAME
 
 #Realizo el BACKUP
-cp ${FILENAME} ${FILENAME}_$(date +%d-%m-%Y) || true
+mv nohup.out nohup.bkp || true
+cp ${FILENAME}-*.jar ${FILENAME}_$(date +%d-%m-%Y).bkp || true
 
 #DEPLOY
 echo "DEPLOY"
-cp ${WORKSPACE}/target/*.jar $FILENAME && echo "Se realizo el DEPLOY"
+FILENAME=$FILENAME.jar
+cp ${WORKSPACE}/build/libs/*.jar $FILENAME && echo "Se realizo el DEPLOY"
 
-#Artifact perms
+#Permisos
 chown --reference *.jar_$(date +%d-%m-%Y) $FILENAME
 chmod --reference *.jar_$(date +%d-%m-%Y) $FILENAME
-
-#ps aux | grep -v grep | grep $FILENAME
-
-# Variable API
-API="servicios-cmp-backend"
 
 #Path to pgrep command
 PGREP="/usr/bin/pgrep"
 
 #Find process pid
-pgrep $(echo $API.jar) || true
-
-#Control del servicio
-#START="/usr/sbin/service $API start"
-#STOP="/usr/sbin/service $API stop"
-
-##Si el proceso no esta corriendo
-#if [ $? -ne 0 ]
-#then
-#    # Inicio el servicio
-#    /usr/sbin/service $(echo $API) start
-#fi
-
-/usr/sbin/service $API stop || true
-sleep 1 && /usr/sbin/service $API start
+pgrep $(echo $FILENAME) || true
 ps aux | grep -v grep | grep $FILENAME
-
-#'''

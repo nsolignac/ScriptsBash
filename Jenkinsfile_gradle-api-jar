@@ -69,7 +69,7 @@ pipeline {
                     submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'Soligna',
                     url: URL]]])
 
-                sh './grailsw clean && ./grailsw -Dgrails.env=integration package'
+                //sh './grailsw clean && ./grailsw -Dgrails.env=integration package'
             }
             post {
                 success {

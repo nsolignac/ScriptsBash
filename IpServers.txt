@@ -25,7 +25,7 @@ Server's IP:
 - WsClient
 	192.168.34.134
 
-- Dynform 2.0 (API, Web, DB, Cron)
+- Dynform 2.0 (API, Web, DB, Cron) - http://dfweb.sondeosglobal.com
   192.168.34.108
 
 - Multichannel Telecom (API, Web, Widget, DB)

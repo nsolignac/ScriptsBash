@@ -11,7 +11,8 @@ rm *.bkp|| true
 mv nohup.out nohup.bkp || true
 mv ${FILENAME}-*.jar ${FILENAME}_$(date +%d-%m-%Y).bkp || true
 
-#GREP FILENAME
+#Agregamos el numero de version al FILENAME
+FILENAME_TMP=$FILENAME
 FILENAME=$FILENAME-$(ls ${WORKSPACE}/build/libs/ | grep 'api-[0-3]\.[0-9][0-9].jar$' | grep -o '[0-3]\.[0-9][0-9]').jar
 
 #DEPLOY

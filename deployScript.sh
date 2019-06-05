@@ -24,5 +24,5 @@ chown --reference *.jar_$(date +%d-%m-%Y) $FILENAME
 chmod --reference *.jar_$(date +%d-%m-%Y) $FILENAME
 
 #Reiniciamos el proceso
-pkill -9 -f $FILENAME
+pkill -9 -f $FILENAME_TMP
 nohup java -jar -Dgrails.env=$ENVIRONMENT -Dserver.port=443 $FILENAME &

@@ -190,7 +190,7 @@ Server's IP:
 - Topic Service QA
 	192.168.20.101
 
-- Chip Mail Web
+- Chip Mail Web / Redmine Veolia
   192.168.35.131
 
 - Multichannel Demo (BBVA)

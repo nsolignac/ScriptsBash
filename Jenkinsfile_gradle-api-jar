@@ -11,24 +11,20 @@ def getEmailRecipients() {
 def URL='http://git.snd.int/jenkins/api.git'
 
 pipeline {
-    /*agent {
+    agent {
         node {
             label ''
         }
-    }*/
+    }
 
     post {
         always {
             emailext body: '''${JELLY_SCRIPT,template="static-analysis"}''',
-                    attachmentsPattern: 'inputBox.txt',
                     attachLog: true,
                     compressLog: true,
                     mimeType: 'text/html',
                     subject: "Pipeline Finalizada: ${currentBuild.fullDisplayName}",
-                    to: "${params.EMAIL_RECIPIENTS}",
-                    recipientProviders: [[$class: 'CulpritsRecipientProvider']]
-
-
+                    to: "${params.EMAIL_RECIPIENTS}"
         }
         success {
             updateGitlabCommitStatus name: 'build', state: 'success'
@@ -59,23 +55,61 @@ pipeline {
     }
 
     stages {
-        stage('Build'){
-            agent {label 'PREPRO - 74' && label 'QA - 110'}
-            steps {
-                checkout([$class: 'GitSCM',
-                    branches: [[name: "${params.GIT_TAG}"]],
-                    doGenerateSubmoduleConfigurations: false,
-                    extensions: [[$class: 'LocalBranch', localBranch: "${params.GIT_TAG}"]],
-                    submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'Soligna',
-                    url: URL]]])
+        stage('Builds'){
+            parallel {
+                stage ('Build en Desa') {
+                    agent {label 'PREPRO - 74'}
+                    environment {
+                        ENVIRONMENT = "integration"
+                    }
+                    steps {
+                        checkout([$class: 'GitSCM',
+                            branches: [[name: "${params.GIT_TAG}"]],
+                            doGenerateSubmoduleConfigurations: false,
+                            extensions: [[$class: 'LocalBranch', localBranch: "${params.GIT_TAG}"]],
+                            submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'Soligna',
+                            url: URL]]])
 
-                //sh './grailsw clean && ./grailsw -Dgrails.env=integration package'
-            }
-            post {
-                success {
-                    // Guardamos los binarios en el agente.
-                    echo 'Archivando binarios...'
-                    archiveArtifacts artifacts: '**/build/libs/*.jar'
+                        //sh './grailsw clean && ./grailsw -Dgrails.env=$ENVIRONMENT package'
+                    }
+                    post {
+                        success {
+                            echo "Archivando Binarios"
+                            //echo 'Archivando binarios...'
+                            //archiveArtifacts artifacts: '"${env.WORKSPACE}"/build/libs/*.jar'
+                        }
+                    }
+                }
+
+                stage ('Build en QA') {
+                    agent {label 'QA - 20.101'}
+                    environment {
+                        ENVIRONMENT = "preproduction"
+                    }
+                    steps {
+                        script {
+                            def tag = sh(returnStdout: true, script: "git tag --contains | head -1").trim()
+                            def isQA = "${params.GIT_TAG}".contains("q") || tag.contains("q")
+
+                            if(isQA) {
+                                checkout([$class: 'GitSCM',
+                                    branches: [[name: "${params.GIT_TAG}"]],
+                                    doGenerateSubmoduleConfigurations: false,
+                                    extensions: [[$class: 'LocalBranch', localBranch: "${params.GIT_TAG}"]],
+                                    submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'Soligna',
+                                    url: URL]]])
+
+                                //sh './grailsw clean && ./grailsw -Dgrails.env=$ENVIRONMENT package'
+                            }
+                        }
+                    }
+                    post {
+                        success {
+                            echo "Archivando Binarios"
+                            //echo 'Archivando binarios...'
+                            //archiveArtifacts artifacts: '"${env.WORKSPACE}"/build/libs/*.jar'
+                        }
+                    }
                 }
             }
         }
@@ -85,17 +119,19 @@ pipeline {
                 stage ('Deploy en Desa'){
                     agent {label 'PREPRO - 74'}
                     steps {
-                        def isPre = {"${params.GIT_TAG}" == "origin/master"}
+                        script {
+                            def isPre = {"${params.GIT_TAG}" == "origin/master"}
 
-                        if(isPre) {
-                            configFileProvider([configFile(fileId: '29812639-10d6-411c-85f9-5dd08e8d2b48',
-                                    targetLocation: 'DeployMCAPI.sh')]) {
-                                echo 'Archivo de Deploy copiado en el ambiente'
+                            if(isPre) {
+                                configFileProvider([configFile(fileId: '29812639-10d6-411c-85f9-5dd08e8d2b48',
+                                        targetLocation: 'DeployMCAPI.sh')]) {
+                                    echo 'Archivo de Deploy copiado en el ambiente'
+                                }
+
+                                echo "Se comienza el DEPLOY en "+"${env.NODE_NAME}"
+                                //sh '/bin/bash '+'DeployMCAPI.sh'
+                                echo "Se finaliza el DEPLOY en "+"${env.NODE_NAME}"
                             }
-
-                            echo "Se comienza el DEPLOY en "+"${env.NODE_NAME}"
-                            //sh '/bin/bash '+'DeployMCAPI.sh'
-                            echo "Se finaliza el DEPLOY en "+"${env.NODE_NAME}"
                         }
                     }
                 }

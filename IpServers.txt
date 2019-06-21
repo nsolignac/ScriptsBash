@@ -17,8 +17,6 @@ Server's IP:
 - hedwig-RenewalTool
   	192.168.33.178
 
-
-
 - Hermes
 - PSO
 - MessageSender
@@ -196,6 +194,8 @@ Server's IP:
 - Multichannel Demo (BBVA)
   192.168.20.116
 
+- RSyslog Server
+  192.168.9.124
 
 DB's
 ++++

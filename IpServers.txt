@@ -152,7 +152,7 @@ Server's IP:
 - Multichannel QA API
   192.168.20.101
 
-- Multichannel QA Web / Cron CMP Campana QA / Proc. Reportes QA
+- Multichannel QA Web / Multichannel BBVA Web / Cron CMP Campana QA / Proc. Reportes QA
 	192.168.20.105
 
 - Frontera 1

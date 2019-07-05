@@ -1,0 +1,4 @@
+                                            DBS (IP's Y CREDENCIALES)
+
+IP   DB   USER         PWD
+*    *    nsolignac    ***

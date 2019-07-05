@@ -1,11 +1,11 @@
 #!greoovy
 def getEmailRecipients() {
-    return 'nicolas.solignac@sondeos.com.ar'
+    return 'DESTINATARIO@sondeos.com.ar'
 }
 
 def URL = ""
 
-currentBuild.displayName += " Multichannel Web Test"
+currentBuild.displayName += " Web Test"
 currentBuild.description += " | Repo origin URL: $URL"
 
 pipeline {
@@ -63,7 +63,7 @@ pipeline {
                         checkout scm
 
                         echo "Se comienza el DEPLOY en "+"${env.NODE_NAME}"
-                        // sh '/bin/bash '+'dev_script.sh'
+                        // sh '/bin/bash '+'DeployWeb.sh'
                         echo "Se finaliza el DEPLOY en "+"${env.NODE_NAME}"
                     }
                 }
@@ -76,10 +76,10 @@ pipeline {
                                 branches: [[name: "${params.GIT_TAG}"]],
                                 doGenerateSubmoduleConfigurations: false,
                                 extensions: [[$class: 'LocalBranch', localBranch: "${params.GIT_TAG}"]],
-                                submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'Soligna',
+                                submoduleCfg: [], userRemoteConfigs: [[credentialsId: '{CredencialesGITLABSondeos}',
                                 url: URL]]])
 
-                            def tag = "${env.TAG_NAME}" != 'origin/master'
+                            def tag = "${params.GIT_TAG}" != 'origin/master'
 
                             if(tag) {
                                 echo "Checking out: ${params.GIT_TAG}"
@@ -90,13 +90,13 @@ pipeline {
                                             body: "Se requiere aprovacion para proceder con el Deploy de ${currentBuild.fullDisplayName} en ${env.NODE_NAME}.\nAcceder al siguiente link: ${env.RUN_DISPLAY_URL}"
                                         input message:'Aprobar Deploy en QA?', submitter: "admin"
 
-                                        configFileProvider([configFile(fileId: 'bcd32020-6f41-453e-9c09-9d9696d8ca1d',
-                                                targetLocation: 'DeployWebPHP')]) {
+                                        configFileProvider([configFile(fileId: '{ID-ManagedFileByJenkins}',
+                                                targetLocation: 'DeployWeb')]) {
                                                 echo 'Script de Deploy copiado en el ambiente'
                                         }
 
                                     echo "Se comienza el DEPLOY en "+"${env.NODE_NAME}"
-                                    //sh '/bin/bash '+'DeployWebPHP'
+                                    //sh '/bin/bash '+'DeployWeb'
                                     echo "Se finaliza el DEPLOY en "+"${env.NODE_NAME}"
                                 }
                             }

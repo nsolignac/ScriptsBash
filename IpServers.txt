@@ -167,8 +167,10 @@ Server's IP:
 - Virtualizadores Android
   192.168.35.111 - Tandem, Argenpesos
 
-- Cron Alta Campana
+- Cron Alta Campana PROD
   192.168.33.148
+- Cron Alta Campana QA
+  192.168.20.105
 
 - DB Mongo Celulares / Scripts / Number-Land / Cron Reporte IVR
   192.168.33.113

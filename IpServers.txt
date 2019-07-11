@@ -213,3 +213,14 @@ DB's
   db_inetqa / db_inetqa.31
   frontera2qa / frontera2qa.31
   topicserviceqa / topicserviceqa.31
+
+PWD's
+=====
+
+N:L0thlori3n.13
+V:L0thlorien
+S:sondeos
+O:123456pepe123
+W:W1nt3rf3ll
+D:321pepe321
+Q:V0l4nt1s

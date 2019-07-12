@@ -152,7 +152,7 @@ Server's IP:
 - Multichannel QA API
   192.168.20.101
 
-- Multichannel QA Web / Multichannel BBVA Web / Cron CMP Campana QA / Proc. Reportes QA
+- Multichannel QA Web / Multichannel DEMO Web / Cron CMP Campana QA / Proc. Reportes QA
 	192.168.20.105
 
 - Frontera 1
@@ -214,9 +214,10 @@ DB's
   frontera2qa / frontera2qa.31
   topicserviceqa / topicserviceqa.31
 
+
 PWD's
 =====
-
+A:D1m4.p0b4
 N:L0thlori3n.13
 V:L0thlorien
 S:sondeos

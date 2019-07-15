@@ -1,0 +1,5 @@
+try {
+   db.MensajesBulk.deleteMany( { "fechaIngreso" : { $lt : ISODate("2019-07-15T00:00:00.000Z")}, "idUsuario" : "23",} );
+} catch (e) {
+   print (e);
+}

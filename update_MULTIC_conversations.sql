@@ -10,3 +10,7 @@ WHERE company_id = '99' AND messenger_id = '197' AND last_updated >= NOW() - INT
 UPDATE multic.conversation
 SET status = 'closed'
 WHERE company_id = '99' AND messenger_id = '197' AND last_updated >= NOW() - INTERVAL 50 DAY;
+
+UPDATE multic.conversation
+SET last_activity = NOW()
+WHERE company_id = '99' AND messenger_id = '197' AND last_updated >= NOW() - INTERVAL 50 DAY;

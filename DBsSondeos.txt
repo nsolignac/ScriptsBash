@@ -1,4 +1,5 @@
                                             DBS (IP's Y CREDENCIALES)
 
-IP   DB     DESCRIPCION         USER         PWD
-*    *      Usuario Global      nsolignac    ***
+IP       DB/Coll     DESCRIPCION             USER         PWD
+*        *           Usuario Global SQL      nsolignac    N*******
+20.111   *           Mongo QA                -            -

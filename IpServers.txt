@@ -199,6 +199,15 @@ Server's IP:
 - RSyslog Server
   192.168.9.214
 
+- HA Proxy Galera Reportes - U:'haproxy'/P:'haproxy'
+  192.168.33.80
+
+- HA Proxy Galera Audios
+  192.168.34.114
+
+- HA Proxy Galera QA
+  192.168.10.93
+
 DB's
 ++++
 

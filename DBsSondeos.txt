@@ -1,10 +1,9 @@
                                             DBS (IP's Y CREDENCIALES)
 
 IP       DB/Coll     TIPO           DESCRIPCION             USER         PWD
-*        *           SQL            Usuario Global SQL      nsolignac    N******3
-20.111   *           MongoDB        Mongo QA                -            -
+*        *           SQL            Usuario Global SQL      nsolignac    N***.**3
 *        *           MongoDB        Mongo PROD              rootAdm      N
-
+20.111   *           MongoDB        Mongo QA                -            -
 
 
 -----------------------

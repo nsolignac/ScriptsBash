@@ -1,5 +1,35 @@
                                             DBS (IP's Y CREDENCIALES)
 
-IP       DB/Coll     DESCRIPCION             USER         PWD
-*        *           Usuario Global SQL      nsolignac    N*******
-20.111   *           Mongo QA                -            -
+IP       DB/Coll     TIPO           DESCRIPCION             USER         PWD
+*        *           SQL            Usuario Global SQL      nsolignac    N******3
+20.111   *           MongoDB        Mongo QA                -            -
+
+
+
+-----------------------
+CLUSTER GALERA REPORTES
+-----------------------
+HA Proxy - http://192.168.33.80/haproxy?stats
+Master  - 192.168.33.40 3306 (Scripts - /dbdata/scripts/)
+Worker 1 - 192.168.33.41 3306
+Worker 2 - 192.168.33.121 3306 (Scripts - /dbdata/scripts/)
+
+Replica System 10.10.10.10
+
+---------------------
+CLUSTER GALERA AUDIOS
+---------------------
+HA Proxy - http://192.168.34.114/haproxy?stats
+Master - 192.168.34.126 3306
+Worker 1 - 192.168.34.133 3306
+
+Replica System 10.10.10.10
+
+----------------
+CLUSTER MONGO DB
+----------------
+
+Master - 192.168.33.131 27017
+Replica 1 - 192.168.33.132 27017
+Replica 2 - 192.168.33.133 27017
+Replica 3 - 192.168.33.101 27017 - (!)OFFLINE

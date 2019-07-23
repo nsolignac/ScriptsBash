@@ -3,6 +3,7 @@
 IP       DB/Coll     TIPO           DESCRIPCION             USER         PWD
 *        *           SQL            Usuario Global SQL      nsolignac    N******3
 20.111   *           MongoDB        Mongo QA                -            -
+*        *           MongoDB        Mongo PROD              rootAdm      N
 
 
 
@@ -33,3 +34,16 @@ Master - 192.168.33.131 27017
 Replica 1 - 192.168.33.132 27017
 Replica 2 - 192.168.33.133 27017
 Replica 3 - 192.168.33.101 27017 - (!)OFFLINE
+
+-----
+PWD's
+-----
+
+A:D1m4.p0b4
+N:L0thlori3n.13
+V:L0thlorien
+S:sondeos
+O:123456pepe123
+W:W1nt3rf3ll
+D:321pepe321
+Q:V0l4nt1s

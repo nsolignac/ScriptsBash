@@ -5,16 +5,21 @@ from __future__ import print_function, unicode_literals
 from PyInquirer import style_from_dict, Token, prompt, Separator
 from pprint import pprint
 
+# DEFINIMOS ALGUNAS VARIABLES
 falsi = False
 truti = True
+# server =
+# port =
+# user =
+# passwd = 
 
 style = style_from_dict({
-    Token.Separator: '#cc5454',
-    Token.QuestionMark: '#673ab7 bold',
-    Token.Selected: '#cc5454',  # default
-    Token.Pointer: '#673ab7 bold',
+    Token.Separator: '#48bd2b',
+    Token.QuestionMark: '#48bd2b bold',
+    Token.Selected: '#48bd2b',  # default
+    Token.Pointer: '#48bd2b bold',
     Token.Instruction: '',  # default
-    Token.Answer: '#f44336 bold',
+    Token.Answer: '#48bd2b bold',
     Token.Question: '',
 })
 

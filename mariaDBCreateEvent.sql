@@ -1,6 +1,6 @@
 /*
 # !! EVENT OVERVIEW !!: https://mariadb.com/kb/en/library/events/
-
+# SOURCE CREATE EVENT: https://mariadb.com/kb/en/library/create-event/
 CREATE [OR REPLACE]
     [DEFINER = { user | CURRENT_USER | role | CURRENT_ROLE }]
     EVENT

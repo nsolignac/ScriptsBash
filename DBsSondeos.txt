@@ -16,6 +16,7 @@ Worker 2 - 192.168.33.121 3306 (Scripts - /dbdata/scripts/)
 
 Replica System 10.10.10.10
 
+
 ---------------------
 CLUSTER GALERA AUDIOS
 ---------------------
@@ -24,6 +25,17 @@ Master - 192.168.34.126 3306
 Worker 1 - 192.168.34.133 3306
 
 Replica System 10.10.10.10
+
+
+--------------------------------
+CLUSTER GALERA MULTICHANNEL PROD
+--------------------------------
+HA Proxy - http://192.168.33.22/haproxy?stats
+Master - 192.168.33.102 3306
+Worker 1 - 192.168.33.156 3306
+
+Replica System 10.10.10.10
+
 
 ----------------
 CLUSTER MONGO DB

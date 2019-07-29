@@ -1,4 +1,6 @@
 /*
+# !! EVENT OVERVIEW !!: https://mariadb.com/kb/en/library/events/
+
 CREATE [OR REPLACE]
     [DEFINER = { user | CURRENT_USER | role | CURRENT_ROLE }]
     EVENT

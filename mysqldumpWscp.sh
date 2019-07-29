@@ -2,6 +2,7 @@
 
 # SOURCE: https://dev.mysql.com/doc/mysql-replication-excerpt/5.7/en/replication-howto-mysqldump.html
 # CFG TO FILE SOURCE: https://www.linode.com/docs/databases/mysql/use-mysqldump-to-back-up-mysql-or-mariadb/#automate-backups-with-cron
+
 DBNAME='{NOMBRE DE LA DB}'
 SVD='{IP SERVER DESTINO}'
 

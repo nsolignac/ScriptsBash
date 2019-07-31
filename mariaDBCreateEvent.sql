@@ -38,8 +38,8 @@ CREATE EVENT myevent
 The previous statement creates an event named myevent. This event executes once — one hour following its creation — by running an SQL statement that increments the value of the myschema.mytable table's mycol column by 1.
 */
 
-CREATE EVENT event_name
-ON SCHEDULE EVERY 1 DAY
-STARTS CURRENT_TIMESTAMP + INTERVAL 1 HOUR
-ENDS
-DO some_task;
+CREATE EVENT mcqa.TruncateAgencyContact
+    ON SCHEDULE EVERY 1 DAY
+    STARTS CURRENT_TIMESTAMP + INTERVAL 2 HOUR
+    DO
+        TRUNCATE TABLE agency_contact;

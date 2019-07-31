@@ -4,7 +4,7 @@ IP       DB/Coll     TIPO           DESCRIPCION             USER         PWD
 *        *           SQL            Usuario Global SQL      nsolignac    N***.**3
 *        *           MongoDB        Mongo PROD              rootAdm      N
 20.111   *           MongoDB        Mongo QA                -            -
-
+20.105
 
 -----------------------
 CLUSTER GALERA REPORTES
@@ -35,6 +35,14 @@ Master - 192.168.33.102 3306
 Worker 1 - 192.168.33.156 3306
 
 Replica System 10.10.10.10
+
+
+--------------------------------
+CLUSTER GALERA MULTICHANNEL QA
+--------------------------------
+HA Proxy - http://192.168.10.93/haproxy?stats
+Master - 192.168.10.91 3306
+Worker 1 - 192.168.10.92 3306
 
 
 ----------------

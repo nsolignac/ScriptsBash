@@ -1,0 +1,1 @@
+mysqldump --defaults-extra-file=/home/t1000/.nsolignac.cnf -u nsolignac -h 192.168.33.102 --no-data --single-transaction --lock-tables=false MC > /home/t1000/MC_dump_20190730.sql

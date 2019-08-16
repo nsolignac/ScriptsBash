@@ -1,0 +1,213 @@
+-------------------------------------------------STATUS DE CLUSTER GALERA---------------------------------------------
+
+ SHOW GLOBAL STATUS LIKE 'wsrep_%';
+
+---------------------------------------------------------------------------------------------------------------------
+
+saber si el servidor es virtual o fisico (si es fisico no hay resultados, resultado=0)
+
+# dmidecode | grep VMware |
+# dmidecode | grep VMware | wc -l
+
+--------
+$lspci
+
+
+----------------------------autenticación directa a BD------------------------------------------------------
+
+mongo --host 192.168.33.133 --username rootAdm --authenticationDatabase admin -p
+mongo --host 192.168.33.101 --username rootAdm --authenticationDatabase admin -p
+
+
+
+-----------------------------COMPRIMIR Y DESCOMPRIMIR (GZ)-----------------------------------------------
+
+comprimir    --> gzip -9 archivo
+descomprimir --> gunzip archivo.sql.gz
+
+
+-Archivos .tar.gz:
+Comprimir: tar -czvf empaquetado.tar.gz /carpeta/a/empaquetar/
+Descomprimir: tar -xzvf archivo.tar.gz
+
+-Archivos .tar:
+Empaquetar: tar -cvf paquete.tar /dir/a/comprimir/
+Desempaquetar: tar -xvf paquete.tar
+
+-Archivos .gz:
+Comprimir: gzip -9 index.php
+Descomprimir: gzip -d index.php.gz
+
+-Archivos .zip:
+Comprimir: zip archivo.zip carpeta
+Descomprimir: unzip archivo.zip
+
+
+
+
+for DB in `mysql -e "show databases" -u ctoro -p | grep -v Database`; do mysqldump -u ctoro -p --opt --routines --triggers --events --single-transaction $DB > "$DB.sql"; done
+
+
+/etc/init.d/mysqld start --innodb_force_recovery =1
+
+----------------------------------VER LO Q SE ESTA EJECUTANDO EN EL MOMENTO MYSQL ---------------------------------
+
+La consulta SHOW PROCESSLIST sólo muestra los primeros caracteres de la consulta en el campo "Info". Para ver la consulta completa, ejecutar SHOW FULL PROCESSLIST.
+
+SELECT ID, INFO FROM information_schema.processlist where TIME > 100;
+SHOW PROCESSLIST\G
+
+-------------------------------------------------------------------------------------------------------------------------
+respaldar todas las db en una sola linea:
+
+for DB in `mysql -e "show databases" -u backupUser -pbackup.3135 | grep -v Database`; do mysqldump -u backupUser -pbackup.3135 --opt --routines --triggers --events --single-transaction $DB > "$DB.sql"; done
+
+
+
+------------------------------------------LUZ MONITOR--------------------------------------------------------------
+
+echo 460 > /sys/class/backlight/intel_backlight/brightness
+
+
+---------------------------VER LO QUE SE ESTA EJECUTANDO MONGO (MAYOR DE 3 SEG)-------------------------------------
+
+db.currentOp({“secs_running”: {$gte: 0}})
+
+
+----------------------------INDICE MONGODB ------------------------------------------------------------------------
+
+db.MensajesBulk.ensureIndex({"campania":1}, { background: true } )
+
+
+
+-----------------Borrar archivos log mysql-bin o mysqld-bin --------------------------------------------------------
+
+SHOW VARIABLES LIKE '%logs%';
+SHOW GLOBAL VARIABLES LIKE '%logs%';
+
+
+limpiar logs de mysql anteriores a hoy:
+mysql> PURGE BINARY LOGS BEFORE NOW();
+
+mantenimiento de logs automaticamente a los 3 días
+mysql> SET GLOBAL expire_logs_days = 3;
+
+
+-----------------------------------MONITOREAR REPLICA--------------------------------------------------------------
+
+SHOW GLOBAL STATUS LIKE 'wsrep_%';
+
+
+--------------------------------------------------------------------------------------------------------------------
+-Ver DEADLOCK:
+
+SHOW ENGINE INNODB STATUS \G
+
+
+--------------------------------CONSULTA PARA VER DESFRAGMENTACION DE TABLAS MYSQL--------------------------------
+select
+     table_schema
+    ,table_name
+    ,data_length
+    ,data_free
+    ,(data_free/data_length)*100 AS frag_percent
+    ,engine
+from information_schema.tables
+where
+    table_schema = 'cmp'
+    and data_free > 0
+order by frag_percent desc;
+
+
+
+--------------------------------VER TAMAÑO DE TODAS LAS DB EN UN SERVER -------------------------------------------
+select
+    table_schema "DATABASE",
+    convert(sum(data_length+index_length)/1048576,decimal(6,2)) "SIZE (MB)"
+from
+    information_schema.tables
+where
+    table_schema!="information_schema"
+group by
+    table_schema;
+
+
+
+-----------------------------------CAMBIAR ENCODING DB ------------------------------------------------------------
+
+alter database campania default character set latin1;
+alter database campania default collate latin1_swedish_ci;
+
+
+ALTER TABLE `CMP_Usuario` CHARACTER SET latin1 COLLATE latin1_swedish_ci;
+ALTER TABLE CMP_OutBound CONVERT TO CHARACTER SET latin1;
+
+
+-----------------------------------------------------------------------------------------------------------------------
+ saber si el sistema operativo trabaja con SysV init
+
+ ps -p 1
+
+ ----------------------VERIFICAR ESTADO DE LAS TABLAS Y REPARAR EN CASO DE SER NECESARIO--------------------------------
+
+mysqlcheck --check DTV_BCK --user="root" -p
+
+
+*Reparar:
+    mysql -u root -p
+
+    Luego debemos señalar qué base de datos usaremos, o sea, cuál es la base de datos que tiene la tabla corrupta.
+
+    use DTB_BCK;
+
+    Y ahora le decimos que repare la tabla corrupta:
+
+    repair table DTV_PartesFoto_old_2019;
+
+
+_________________________________________borrar sms encolados en la collection MensajesBulk____________________________
+
+db.getCollection('MensajesBulk').find({"idUsuario":"23"},{"fechaIngreso":{$lt:ISODate("2019-04-10T00:00:00Z")}}).count()
+db.getCollection('MensajesBulk').remove({"idUsuario":"23"},{"fechaIngreso":{$lt:ISODate("2019-04-10T00:00:00Z")}})
+
+
+------------------------------------------------- TAMAÑOS MongoDB -----------------------------------------------------
+
+-Para ver el tamaño de una colección utilizaremos los siguientes comandos:
+db.collection.dataSize(): el tamaño de los datos en la colección.
+db.collection.index.stats().indexSizes: Ver tamaño de un índice.
+db.collection.storageSize(): la reserve de espacio incluido el espacio no utlizado.
+db.collection.totalSize(): El tamaño de los datos más el de los índices.
+db.collection.totalIndexSize(): el tamaño de los índices.
+
+Este script muestra el tamaño de todas las bases de datos que hay en la instancia de MongoDB:
+db._adminCommand("listDatabases").databases.forEach(function (d) {mdb = db.getSiblingDB(d.name); printjson(mdb.stats())})
+
+Este script muestra el tamaño de todas las colecciones de todas las bases de datos que hay en la instancia de MongoDB:
+ db._adminCommand("listDatabases").databases.forEach(function (d) {mdb = db.getSiblingDB(d.name); mdb.getCollectionNames().forEach(function(c) {s = mdb[c].stats(); printjson(s)})})
+-----------------------------------------------------------------------------------------------------------------------
+
+-listar usuarios en mongodb
+db.getUsers()
+
+
+-Ver privilegios de un rol
+db.getRoles()
+db.getRole("cmpUsers", { showPrivileges: true } )
+
+
+-Cambiar prioridad de un solo nodo del replset:
+cfg = rs.conf()
+cfg.members[id].priority = (valor entre 0 y 1000)
+ejm:   cfg.members[2].priority = 0.5
+rs.reconfig(cfg)
+
+##Operadores condicionales utilizados por MongoDB para evaluar las condiciones de los valores a encontrar son los siguientes:
+
+$gt: greater than (mayor que)
+$gte: greater than or equal (mayor o igual que)
+$lt: less than (menor que)
+$lte: less than or equal (menor o igual que)
+$ne: not equal (distinto de)
+$in: in (dentro de(un array)
+$nin: not in (no dentro de (un array))

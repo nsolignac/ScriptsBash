@@ -1,10 +1,12 @@
                                             DBS (IP's Y CREDENCIALES)
 
-IP       DB/Coll     TIPO           DESCRIPCION             USER         PWD
-*        *           SQL            Usuario Global SQL      nsolignac    N***.**3
-*        *           MongoDB        Mongo PROD              rootAdm      N
-20.111   *           MongoDB        Mongo QA                -            -
-20.105
+IP          DB/Coll     TIPO           DESCRIPCION             USER         PWD
+*           *           SQL            Usuario Global SQL      nsolignac     N
+33.13[1-4]  *           MongoDB        Mongo PROD              rootAdm       N
+20.111      *           MongoDB        Mongo QA                -             -
+34.135      *           SQL            Hermes & Hermes Old     nsolignac     N
+9.163       esme
+
 
 -----------------------
 CLUSTER GALERA REPORTES

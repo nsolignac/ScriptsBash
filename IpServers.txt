@@ -208,6 +208,9 @@ Server's IP:
 - HA Proxy Galera QA
   192.168.10.93
 
+- Lnx92
+  192.168.9.163
+
 DB's
 ++++
 

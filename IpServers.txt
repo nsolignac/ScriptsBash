@@ -193,7 +193,7 @@ Server's IP:
 - Chip Mail Web / Redmine Veolia
   192.168.35.131
 
-- Multichannel Demo (BBVA)
+- Multichannel Demo API & Topics Service (BBVA)
   192.168.20.116
 
 - RSyslog Server

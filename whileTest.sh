@@ -5,13 +5,20 @@
 
 DATEI=`date -d "-60 days" "+%Y-%m-%d %H:%M:%S"`
 DATEF=`date "+%Y-%m-%d %H:%M:%S"`
-d=0
+COMM='apt-install -y cosas'
+i=0
 
 echo "$DATEI"
 echo "$DATEF"
 
-while [ $d -le 4 ]
+$COMM
+
+while [ $? -ne 1 ]
 do
-    echo "Esto es un test de reemplazo de variables donde $d cambia"
-    d=$(( $d + 1 ))
+    $COMM
+    if [ i -ne 0 ]
+        echo "Esto es un test de reemplazo de variables donde $i cambia"
+        i=$(( $i + 1 ))
+    else
+        break
 done

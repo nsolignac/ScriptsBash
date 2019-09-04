@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # SOURCE
 # DATE:
 # https://unix.stackexchange.com/questions/49053/linux-add-x-days-to-date-and-get-new-virtual-date
@@ -5,20 +7,27 @@
 
 DATEI=`date -d "-60 days" "+%Y-%m-%d %H:%M:%S"`
 DATEF=`date "+%Y-%m-%d %H:%M:%S"`
-COMM='apt-install -y cosas'
-i=0
+COMM='apt-get install -y cosas'
+I=0
 
 echo "$DATEI"
 echo "$DATEF"
 
-$COMM
+echo "Instalando Whatsapp ..."
+$COMM && echo -n "Whatsapp Installation OK"
+I=$(echo $?)
 
-while [ $? -ne 1 ]
+while [ $I -ne 0 ]
 do
+    echo "Instalando Whatsapp ..."
     $COMM
-    if [ i -ne 0 ]
-        echo "Esto es un test de reemplazo de variables donde $i cambia"
-        i=$(( $i + 1 ))
+    I=$(echo $?)
+    if [ $I -ne 0 ]; then
+        sleep 120
+        echo -n "Whatsapp Installation FAIL"
+        echo -n "Retrying in 2 minutes"
     else
+        echo -n "Whatsapp Installation OK"
         break
+    fi
 done

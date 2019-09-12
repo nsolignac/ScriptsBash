@@ -1,0 +1,50 @@
+version: '2'
+services:
+  influxdb:
+    image: influxdb:latest
+    volumes:
+      # Mount for influxdb data directory
+      - ../TICK/influxdb/data:/var/lib/influxdb
+      # Mount for influxdb configuration
+      - ../TICK/influxdb/config/:/etc/influxdb/
+    ports:
+      # The API for InfluxDB is served on port 8086
+      - "8086:8086"
+      - "8082:8082"
+
+  telegraf:
+    image: telegraf:latest
+    links:
+      - influxdb
+    volumes:
+      # Mount for telegraf configuration
+      - ../TICK/telegraf/:/etc/telegraf/
+    depends_on:
+      - influxdb
+
+  kapacitor:
+    image: kapacitor:latest
+    volumes:
+      # Mount for kapacitor data directory
+      - ../TICK/kapacitor/data:/var/lib/kapacitor
+      # Mount for kapacitor configuration
+      - ../TICK/kapacitor/config/:/etc/kapacitor/
+    # Kapacitor requires network access to InfluxDB
+    links:
+      - influxdb
+    ports:
+      # The API for Kapacitor is served on port 9092
+      - "9092:9092" 
+
+  chronograf:
+    image: chronograf:latest
+    volumes:
+      # Mount for chronograf database
+      - ../TICK/chronograf/data/:/var/lib/chronograf/
+    ports:
+      # The WebUI for Chronograf is served on port 8888
+      - "8888:8888"
+    depends_on:
+      - influxdb
+      - kapacitor
+      - telegraf

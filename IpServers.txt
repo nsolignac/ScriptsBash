@@ -211,6 +211,37 @@ Server's IP:
 - Lnx92
   192.168.9.163
 
+- Docker Test (TICK Stack)
+  192.168.35.40
+
+- Docker Android
+  192.168.35.58
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 DB's
 ++++
 

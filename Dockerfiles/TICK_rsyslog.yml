@@ -18,9 +18,10 @@ services:
       - influxdb
     volumes:
       # Mount for telegraf configuration
-      - ../TICK/telegraf/:/etc/telegraf/
+      - ./TICK/telegraf/:/etc/telegraf/
     depends_on:
       - influxdb
+
 
   kapacitor:
     image: kapacitor:latest

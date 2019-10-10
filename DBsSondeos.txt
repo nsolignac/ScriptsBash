@@ -2,11 +2,12 @@
 
 IP          DB/Coll     TIPO           DESCRIPCION             USER         PWD
 --          -------     ----           -----------             ----         ---
-*           *           SQL            Usuario Global SQL      nsolignac     N
+*           *           MySQL          Usuario Global SQL      nsolignac     N
 33.13[1-4]  *           MongoDB        Mongo PROD              rootAdm       N
 20.111      *           MongoDB        Mongo QA                -             -
-34.135      *           SQL            Hermes & Hermes Old     nsolignac     N
+34.135      *           MySQL          Hermes & Hermes Old     nsolignac     N
 9.163       esme
+34.118      Veraz       MySQL
 
 
 -----------------------
@@ -16,7 +17,7 @@ HA Proxy - http://192.168.33.80/haproxy?stats
 Master  - 192.168.33.40 3306 (Scripts - /dbdata/scripts/)
 Worker 1 - 192.168.33.41 3306
 Worker 2 - 192.168.33.121 3306 (Scripts - /dbdata/scripts/)
-Worker 3 - 192.168.33.120 3306 
+Worker 3 - 192.168.33.120 3306
 
 Replica System 10.10.10.10
 
@@ -45,8 +46,8 @@ Replica System 10.10.10.10
 CLUSTER GALERA MULTICHANNEL QA
 --------------------------------
 HA Proxy - http://192.168.10.93/haproxy?stats
-Master - 192.168.10.91 3306
-Worker 1 - 192.168.10.92 3306
+Master - 192.168.10.92 3306
+Worker 1 - 192.168.10.91 3306 - OFF
 
 
 ----------------

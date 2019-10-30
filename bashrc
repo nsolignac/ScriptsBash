@@ -96,16 +96,17 @@ alias starwars='telnet towel.blinkenlights.nl'
 # User defined aliases
 alias navicat='nohup wine .wine/drive_c/Program\ Files/PremiumSoft/Navicat\ Premium/navicat.exe &'
 alias pycharm='nohup sh /home/usr1/Descargas/pycharm-community-2017.2.4/bin/pycharm.sh &'
-alias robo3t='nohup /home/t1000/Robo3t/bin/robo3t &'
+alias robo3t='nohup /opt/robo3t-1.2.1/bin/robo3t &'
 alias python=python3.6
 alias unity3d='nohup ~/Unity-2017.3.0b1/Editor/Unity &'
-alias frequent_command='/bin/bash /home/usr1/ScriptsBash/frequent_command.sh > /dev/pts/0'
+alias frequent_command='/bin/bash /home/t1000/ScriptsBash/frequent_command.sh > /dev/pts/1'
 alias jupynote='nohup jupyter-notebook &'
 alias eclipse='nohup /home/usr1/eclipse/committers-oxygen/eclipse/eclipse &'
 alias museScore='nohup /home/usr1/Downloads/MuseScore &'
 alias androidStudio='/bin/bash /home/usr1/android-studio/bin/studio.sh &'
 alias loopBack='nohup ffmpeg -f x11grab -r 15 -s 1280x720 -i :0.0+0,0 -vcodec rawvideo -pix_fmt yuv420p -threads 0 -f v4l2 /dev/video0 &'
 alias sonar='/bin/bash /opt/sonarqube-7.4/bin/linux-x86-64/sonar.sh'
+alias explq='/bin/sh /home/t1000/scriptsDB/SQL/mariaDBExplainQuery.sh'
 
 # SSH PROD
 alias j1='ssh nsolignac@192.168.33.152'
@@ -178,8 +179,14 @@ if [ -f /usr/local/lib/python2.7/dist-packages/powerline/bindings/bash/powerline
     source /usr/local/lib/python2.7/dist-packages/powerline/bindings/bash/powerline.sh
 fi
 
-JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64
-export JAVA_HOME
+# Disable Touch Pad
+#xinput --disable 14
 
+JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64
 PATH=$PATH:$JAVA_HOME
-export PATH="opt/apache-maven-3.6.0/bin:$PATH"
+export JAVA_HOME
+export GOPATH=$HOME/Documents/goworkspace
+export GOBIN=$GOPATH/bin
+export PATH="$PATH:opt/apache-maven-3.6.0/bin:$GOROOT/bin:$GOPATH/bin:$GOBIN"
+export HISTTIMEFORMAT="%d/%m/%y %T "
+export PATH=/usr/local/bin:$PATH

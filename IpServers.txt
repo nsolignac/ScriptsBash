@@ -140,7 +140,7 @@ Server's IP:
 - Scripts
   192.168.9.92
 
-- Scripts Old
+- Scripts Old (Scripts EDENOR)
   192.168.9.160
 
 - Lyric

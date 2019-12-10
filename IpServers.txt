@@ -217,6 +217,10 @@ Server's IP:
 - Docker Android
   192.168.35.58
 
+- Obtiene Celco PROD
+  192.168.33.134
+  192.168.33.135
+  192.168.33.189
 
 
 

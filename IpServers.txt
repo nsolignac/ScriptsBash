@@ -214,8 +214,11 @@ Server's IP:
 - Docker Test (TICK Stack)
   192.168.35.40
 
-- Docker Android
+- Docker Android 1
   192.168.35.58
+
+- Docker Android 2
+  192.168.33.90
 
 - Obtiene Celco PROD
   192.168.33.134

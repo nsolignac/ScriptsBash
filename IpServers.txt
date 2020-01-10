@@ -153,7 +153,7 @@ Server's IP:
   192.168.20.101
 
 - Multichannel QA Web / Multichannel DEMO Widget / Multichannel DEMO Web / Cron CMP Campana QA / Proc. Reportes QA
-	192.168.20.105
+	192.168.20.195
 
 - Frontera 1
   192.168.9.43 - lnx22

@@ -16,8 +16,8 @@ CLUSTER GALERA REPORTES
 HA Proxy - http://192.168.33.80/haproxy?stats
 Master  - 192.168.33.40 3306 (Scripts - /dbdata/scripts/)
 Worker 1 - 192.168.33.41 3306
-Worker 2 - 192.168.33.121 3306 (Scripts - /dbdata/scripts/)
-Worker 3 - 192.168.33.120 3306
+Worker 2 - 192.168.33.121 3306 (Scripts - /dbdata/scripts/) - OFF
+Worker 3 - 192.168.33.120 3306 - OFF
 
 Replica System 10.10.10.10
 
@@ -28,7 +28,7 @@ CLUSTER GALERA AUDIOS
 HA Proxy - http://192.168.34.114/haproxy?stats
 Master - 192.168.34.126 3306
 Worker 1 - 192.168.34.123 3306 - OFF
-Worker 2 - 192.168.34.133 3306
+Worker 2 - 192.168.34.133 3306 - OFF
 
 Replica System 10.10.10.10
 
@@ -48,7 +48,7 @@ CLUSTER GALERA MULTICHANNEL QA
 --------------------------------
 HA Proxy - http://192.168.10.93/haproxy?stats
 Master - 192.168.10.92 3306
-Worker 1 - 192.168.10.91 3306 - OFF
+Worker 1 - 192.168.10.91 3306
 
 
 ----------------

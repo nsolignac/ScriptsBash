@@ -228,16 +228,21 @@ Server's IP:
 - Proxy Reverso
   192.168.35.124
 
+- Servidor OVPN
+  192.168.35.37
+
+- Servidor OVPN PAMI
+  192.168.34.152
+
+- Servidores DNS
+  192.168.33.165 - lpsndDNSManager (Master)
+  192.168.9.169 - cprosnddn02
 
 
 
 
 
-
-
-
-
-
+  
 
 
 

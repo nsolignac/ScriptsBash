@@ -238,11 +238,16 @@ Server's IP:
   192.168.33.165 - lpsndDNSManager (Master)
   192.168.9.169 - cprosnddn02
 
+- MC RENAPER
+  192.168.35.131  - mcrenaper.sondeosglobal.com
+  192.168.33.197  - mcrenaperapi.sondeosglobal.com
+
+- ELK (Produccion)
+  192.168.34.65 - http://sondeoslogs.snd.int:5601/
 
 
 
 
-  
 
 
 

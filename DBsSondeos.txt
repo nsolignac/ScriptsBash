@@ -54,11 +54,13 @@ Worker 1 - 192.168.10.91 3306
 ----------------
 CLUSTER MONGO DB
 ----------------
+mongo --host "ipservidor" --username rootAdm --authenticationDatabase admin -p
+Password: N
 
-Master - 192.168.33.131 27017
-Replica 1 - 192.168.33.132 27017
-Replica 2 - 192.168.33.133 27017
-Replica 3 - 192.168.33.101 27017 - (!)OFFLINE
+Master (lprosonmo01) - 192.168.33.131 27017
+Replica 1 (lprosonmo02) - 192.168.33.132 27017
+Replica 2 (lprosonmo03) - 192.168.33.133 27017
+Replica 3 (lprosonmo04) - 192.168.33.101 27017 - (!)OFFLINE
 
 
 ---------------------

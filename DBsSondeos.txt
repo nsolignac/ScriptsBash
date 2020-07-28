@@ -89,9 +89,12 @@ PWD's
 
 
 
+MONGO KILL QUERYS
+-----------------
 
-
-
+mongo --host "" --username rootAdm --authenticationDatabase admin -p
+db.currentOp();
+db.killOp();
 
 
 

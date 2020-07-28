@@ -93,6 +93,7 @@ MONGO KILL QUERYS
 -----------------
 
 mongo --host "" --username rootAdm --authenticationDatabase admin -p
+N
 db.currentOp();
 db.killOp();
 

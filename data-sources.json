@@ -1,0 +1,490 @@
+{
+	"folders": {},
+	"connections": {
+		"mysql5-15f02c272cc-12870cd5dde63e96": {
+			"provider": "mysql",
+			"driver": "mysql5",
+			"name": "Lnx14 - 9.159",
+			"save-password": true,
+			"show-system-objects": true,
+			"read-only": false,
+			"configuration": {
+				"host": "192.168.9.159",
+				"port": "3306",
+				"url": "jdbc:mysql://192.168.9.159:3306/",
+				"home": "/usr",
+				"type": "prod",
+				"properties": {
+					"connectTimeout": "20000"
+				}
+			}
+		},
+		"mariaDB-15f064f6465-75e0bf908f420027": {
+			"provider": "mysql",
+			"driver": "mariaDB",
+			"name": "Galera Reportes - 33.80",
+			"save-password": true,
+			"show-system-objects": true,
+			"read-only": false,
+			"configuration": {
+				"host": "192.168.33.80",
+				"port": "3306",
+				"url": "jdbc:mysql://192.168.33.80:3306/",
+				"type": "prod"
+			}
+		},
+		"mysql5-15f2feb19d6-2fe4338bd985ab96": {
+			"provider": "mysql",
+			"driver": "mysql5",
+			"name": "Development Testing - 10.87",
+			"save-password": true,
+			"show-system-objects": true,
+			"read-only": false,
+			"configuration": {
+				"host": "192.168.10.87",
+				"port": "3306",
+				"url": "jdbc:mysql://192.168.10.87:3306/",
+				"home": "/usr",
+				"type": "test"
+			}
+		},
+		"mysql5-162b14bbb08-22310be9cfd23a1": {
+			"provider": "mysql",
+			"driver": "mysql5",
+			"name": "Veraz HA - 34.118",
+			"save-password": true,
+			"show-system-objects": true,
+			"read-only": false,
+			"configuration": {
+				"host": "192.168.34.118",
+				"port": "3306",
+				"url": "jdbc:mysql://192.168.34.118:3306/",
+				"home": "/usr",
+				"type": "prod",
+				"bootstrap": {
+					"autocommit": false
+				}
+			},
+			"custom-properties": {
+				"database.meta.separate.connection": "false"
+			}
+		},
+		"mariaDB-163263caefd-221b1e00448ca841": {
+			"provider": "mysql",
+			"driver": "mariaDB",
+			"name": "Dynform2",
+			"save-password": true,
+			"show-system-objects": true,
+			"read-only": false,
+			"configuration": {
+				"host": "192.168.34.108",
+				"port": "3306",
+				"database": "dynform2",
+				"url": "jdbc:mysql://192.168.34.108:3306/dynform2",
+				"home": "/usr",
+				"type": "prod",
+				"bootstrap": {
+					"autocommit": false
+				}
+			}
+		},
+		"mysql5-16327afa967-30a2bb49777e52ed": {
+			"provider": "mysql",
+			"driver": "mysql5",
+			"name": "DTV Auditorias -  192.168.9.27",
+			"save-password": true,
+			"show-system-objects": true,
+			"read-only": false,
+			"configuration": {
+				"host": "192.168.9.27",
+				"port": "3306",
+				"url": "jdbc:mysql://192.168.9.27:3306/",
+				"home": "/usr",
+				"type": "prod",
+				"bootstrap": {
+					"autocommit": false
+				}
+			},
+			"custom-properties": {
+				"database.meta.separate.connection": "false"
+			}
+		},
+		"mysql5-1661cbb2e71-26d2901c055525fc": {
+			"provider": "mysql",
+			"driver": "mysql5",
+			"name": "Galera QA - 10.93",
+			"save-password": true,
+			"show-system-objects": true,
+			"read-only": false,
+			"configuration": {
+				"host": "192.168.10.93",
+				"port": "3306",
+				"url": "jdbc:mysql://192.168.10.93:3306/",
+				"home": "/usr",
+				"type": "test",
+				"properties": {
+					"connectTimeout": "20000"
+				}
+			}
+		},
+		"mariaDB-16b9a422995-5a9c3703ab9548df": {
+			"provider": "mysql",
+			"driver": "mariaDB",
+			"name": "MariaDB - dynformInet",
+			"save-password": true,
+			"show-system-objects": true,
+			"show-util-objects": true,
+			"read-only": false,
+			"configuration": {
+				"host": "192.168.33.80",
+				"port": "3306",
+				"database": "dynformInet",
+				"url": "jdbc:mysql://192.168.33.80:3306/dynformInet",
+				"home": "/usr",
+				"type": "prod"
+			}
+		},
+		"mariaDB-16c00c8609b-2e02184641531a9f": {
+			"provider": "mysql",
+			"driver": "mariaDB",
+			"name": "MariaDB - redmine_veolia",
+			"save-password": true,
+			"show-system-objects": true,
+			"show-util-objects": true,
+			"read-only": false,
+			"configuration": {
+				"host": "192.168.10.93",
+				"port": "3306",
+				"database": "redmine_veolia",
+				"url": "jdbc:mysql://192.168.10.93:3306/redmine_veolia",
+				"home": "/usr",
+				"type": "dev"
+			}
+		},
+		"mariaDB-16c49695bc0-641692e10b44c9eb": {
+			"provider": "mysql",
+			"driver": "mariaDB",
+			"name": "MariaDB - MC CDC",
+			"save-password": true,
+			"show-system-objects": true,
+			"show-util-objects": true,
+			"read-only": false,
+			"configuration": {
+				"host": "192.168.34.31",
+				"port": "3306",
+				"database": "MC",
+				"url": "jdbc:mysql://192.168.34.31:3306/MC",
+				"home": "/usr",
+				"type": "dev"
+			}
+		},
+		"mariaDB-16c539bed1d-2aa10d5e6f01ba96": {
+			"provider": "mysql",
+			"driver": "mariaDB",
+			"name": "MariaDB - 192.168.34.31",
+			"save-password": true,
+			"show-system-objects": true,
+			"show-util-objects": true,
+			"read-only": false,
+			"configuration": {
+				"host": "192.168.34.31",
+				"port": "3306",
+				"url": "jdbc:mysql://192.168.34.31:3306/",
+				"home": "/usr",
+				"type": "dev"
+			}
+		},
+		"mariaDB-16c6c75fa6b-4b39f71a006a1666": {
+			"provider": "mysql",
+			"driver": "mariaDB",
+			"name": "Galera Multichannel PROD - 192.168.33.22",
+			"save-password": true,
+			"show-system-objects": true,
+			"show-util-objects": true,
+			"read-only": false,
+			"configuration": {
+				"host": "192.168.33.22",
+				"port": "3306",
+				"url": "jdbc:mysql://192.168.33.22:3306/",
+				"home": "/usr",
+				"type": "prod"
+			}
+		},
+		"mariaDB-16e3d203cb7-51df61e92a247710": {
+			"provider": "mysql",
+			"driver": "mariaDB",
+			"name": "MariaDB - 192.168.34.114 (CMP PROD)",
+			"save-password": true,
+			"read-only": false,
+			"configuration": {
+				"host": "192.168.34.114",
+				"port": "3306",
+				"url": "jdbc:mysql://192.168.34.114:3306/",
+				"home": "/usr",
+				"type": "prod"
+			}
+		},
+		"mariaDB-16e46390642-630c2efa45f45f1f": {
+			"provider": "mysql",
+			"driver": "mariaDB",
+			"name": "MariaDB - 192.168.10.93",
+			"save-password": true,
+			"read-only": false,
+			"configuration": {
+				"host": "192.168.10.93",
+				"port": "3306",
+				"url": "jdbc:mysql://192.168.10.93:3306/",
+				"home": "/usr",
+				"type": "dev"
+			}
+		},
+		"mariaDB-16e6b297252-5b364a966f6bb46e": {
+			"provider": "mysql",
+			"driver": "mariaDB",
+			"name": "MariaDB - cmpqa",
+			"save-password": true,
+			"read-only": false,
+			"configuration": {
+				"host": "192.168.10.93",
+				"port": "3306",
+				"database": "cmpqa",
+				"url": "jdbc:mysql://192.168.10.93:3306/cmpqa",
+				"home": "/usr",
+				"type": "dev"
+			}
+		},
+		"mariaDB-16e88dec35a-7973b62a5611d1f4": {
+			"provider": "mysql",
+			"driver": "mariaDB",
+			"name": "Lnx92 - 192.168.9.163",
+			"save-password": true,
+			"read-only": false,
+			"configuration": {
+				"host": "192.168.9.163",
+				"port": "3306",
+				"url": "jdbc:mysql://192.168.9.163:3306/",
+				"home": "/usr",
+				"type": "prod"
+			}
+		},
+		"mariaDB-16ed16552d4-fb40cf6996cdff7": {
+			"provider": "mysql",
+			"driver": "mariaDB",
+			"name": "Historico (DTV, esme, etc) - 192.168.33.139",
+			"save-password": true,
+			"read-only": false,
+			"configuration": {
+				"host": "192.168.33.139",
+				"port": "3306",
+				"url": "jdbc:mysql://192.168.33.139:3306/",
+				"home": "/usr",
+				"type": "prod"
+			}
+		},
+		"mariaDB-16f1a100bb0-5d5d97006b6e0149": {
+			"provider": "mysql",
+			"driver": "mariaDB",
+			"name": "CMP Desa - 192.168.10.4",
+			"save-password": true,
+			"read-only": false,
+			"configuration": {
+				"host": "192.168.10.4",
+				"port": "3306",
+				"url": "jdbc:mysql://192.168.10.4:3306/",
+				"home": "/usr",
+				"type": "test"
+			}
+		},
+		"mariaDB-16f8baba2a1-2b8b60a46e6a0fa6": {
+			"provider": "mysql",
+			"driver": "mariaDB",
+			"name": "Hermes PROD - 192.168.34.135",
+			"save-password": true,
+			"read-only": false,
+			"configuration": {
+				"host": "192.168.34.135",
+				"port": "3306",
+				"url": "jdbc:mysql://192.168.34.135:3306/",
+				"home": "/usr",
+				"type": "prod"
+			}
+		},
+		"mariaDB-16feecd0ea5-61524ae4ce31df46": {
+			"provider": "mysql",
+			"driver": "mariaDB",
+			"name": "Opticom Replica (Hermes) - 192.168.33.160",
+			"save-password": true,
+			"read-only": false,
+			"configuration": {
+				"host": "192.168.33.160",
+				"port": "3306",
+				"url": "jdbc:mysql://192.168.33.160:3306/",
+				"home": "/usr",
+				"type": "prod"
+			}
+		},
+		"mariaDB-1701ff545ba-3e6f787d1f80b466": {
+			"provider": "mysql",
+			"driver": "mariaDB",
+			"name": "MariaDB - Hermes_Restore - Docker Local",
+			"save-password": true,
+			"read-only": false,
+			"configuration": {
+				"host": "172.17.0.2",
+				"port": "3306",
+				"url": "jdbc:mysql://172.17.0.2:3306/",
+				"home": "/usr",
+				"type": "test"
+			}
+		},
+		"mariaDB-170aad7b0e4-49fa149cba076629": {
+			"provider": "mysql",
+			"driver": "mariaDB",
+			"name": "MariaDB - 192.168.10.235",
+			"save-password": true,
+			"read-only": false,
+			"configuration": {
+				"host": "192.168.10.235",
+				"port": "3306",
+				"url": "jdbc:mysql://192.168.10.235:3306/",
+				"home": "/usr",
+				"type": "dev"
+			}
+		},
+		"mariaDB-171123c8659-4242852bc9cd0da9": {
+			"provider": "mysql",
+			"driver": "mariaDB",
+			"name": "MariaDB - redmine_vl",
+			"save-password": true,
+			"read-only": false,
+			"configuration": {
+				"host": "192.168.34.140",
+				"port": "3306",
+				"url": "jdbc:mysql://192.168.34.140:3306/",
+				"home": "/usr",
+				"type": "dev"
+			},
+			"custom-properties": {
+				"database.meta.separate.connection": "false"
+			}
+		},
+		"mariaDB-1712d369ddf-29f20383475fdf41": {
+			"provider": "mysql",
+			"driver": "mariaDB",
+			"name": "Veraz_Ivr - 192.168.34.118",
+			"save-password": true,
+			"read-only": false,
+			"configuration": {
+				"host": "192.168.34.118",
+				"port": "3306",
+				"url": "jdbc:mysql://192.168.34.118:3306/",
+				"home": "/usr",
+				"type": "prod"
+			}
+		},
+		"mariaDB-172e188b29e-54b9f0508b4b323f": {
+			"provider": "mysql",
+			"driver": "mariaDB",
+			"name": "MariaDB - celulares_test",
+			"save-password": true,
+			"read-only": false,
+			"configuration": {
+				"host": "172.17.0.2",
+				"port": "3306",
+				"database": "celulares_test",
+				"url": "jdbc:mysql://172.17.0.2:3306/celulares_test",
+				"home": "/usr",
+				"type": "dev"
+			}
+		},
+		"mariaDB-173902af4c9-71f3f943fc13a3a5": {
+			"provider": "mysql",
+			"driver": "mariaDB",
+			"name": "maria-test - 172.17.0.2",
+			"save-password": true,
+			"read-only": false,
+			"configuration": {
+				"host": "172.17.0.2",
+				"port": "3306",
+				"url": "jdbc:mysql://172.17.0.2:3306/",
+				"home": "/usr",
+				"type": "test",
+				"handlers": {}
+			}
+		}
+	},
+	"virtual-models": {
+		"mysql5-15f2feb19d6-2fe4338bd985ab96": {
+			"cmp_prepro": {
+				":portabilidad": {
+					"constraints": {
+						"PRIMARY": {
+							"type": "vpk",
+							"attributes": [
+								"sourceAddress",
+								"lastCommit",
+								"celco"
+							]
+						}
+					}
+				}
+			}
+		},
+		"mariaDB-16e3d203cb7-51df61e92a247710": {
+			"cmp": {
+				":GS_RutaNumeroDestino": {
+					"constraints": {
+						"PRIMARY": {
+							"type": "vpk",
+							"attributes": [
+								"numero_id",
+								"destino_id"
+							]
+						}
+					}
+				}
+			}
+		},
+		"mariaDB-16e6b297252-5b364a966f6bb46e": {
+			"cmpqa": {
+				":GS_RutaNumeroDestino": {
+					"constraints": {
+						"PRIMARY": {
+							"type": "vpk",
+							"attributes": [
+								"numero_id",
+								"destino_id"
+							]
+						}
+					}
+				}
+			}
+		}
+	},
+	"connection-types": {
+		"prod": {
+			"name": "Production",
+			"color": "247,159,129",
+			"description": "Production database",
+			"auto-commit": false,
+			"confirm-execute": true,
+			"confirm-data-change": true
+		},
+		"test": {
+			"name": "Test",
+			"color": "196,255,181",
+			"description": "Test (QA) database",
+			"auto-commit": true,
+			"confirm-execute": false,
+			"confirm-data-change": true
+		},
+		"dev": {
+			"name": "Development",
+			"color": "255,255,255",
+			"description": "Regular development database",
+			"auto-commit": true,
+			"confirm-execute": false,
+			"confirm-data-change": false
+		}
+	}
+}

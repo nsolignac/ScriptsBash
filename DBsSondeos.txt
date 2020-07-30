@@ -66,8 +66,19 @@ Replica 3 (lprosonmo04) - 192.168.33.101 27017 - (!)OFFLINE
 ---------------------
 REDMINE VICENTE LOPEZ
 ---------------------
-
 Standalone - 192.168.34.140
+
+
+
+MONGO KILL QUERYS
+-----------------
+mongo --host "" --username rootAdm --authenticationDatabase admin -p
+N
+db.currentOp();
+db.killOp();
+
+
+
 
 -----
 PWD's
@@ -89,13 +100,9 @@ PWD's
 
 
 
-MONGO KILL QUERYS
------------------
 
-mongo --host "" --username rootAdm --authenticationDatabase admin -p
-N
-db.currentOp();
-db.killOp();
+
+
 
 
 

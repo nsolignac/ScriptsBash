@@ -143,7 +143,7 @@ Server's IP:
 - Scripts
   192.168.9.92
 
-- Scripts Old (Scripts EDENOR)
+- Scripts Old (lnx21)(Scripts EDENOR)
   192.168.9.160
 
 - Lyric
@@ -267,20 +267,18 @@ Server's IP:
 
 
 
-DB's
-++++
 
-192.168.10.93 - Cluster Galera QA
-  User&DB / Pwd
-  ------ / ----
 
-  cmpqa / cmpqa.31
-  mcqa / mcqa.31
-  dynformInetqa / dynformInetqa.31
-  cobrexqa / cobrexqa.31
-  db_inetqa / db_inetqa.31
-  frontera2qa / frontera2qa.31
-  topicserviceqa / topicserviceqa.31
+
+
+
+
+
+
+
+
+
+
 
 
 PWD's

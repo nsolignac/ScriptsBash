@@ -2,10 +2,10 @@
 
 IP          DB/Coll     TIPO           DESCRIPCION             USER         PWD
 --          -------     ----           -----------             ----         ---
-*           *           MySQL          Usuario Global SQL      nsolignac     N
+*           *           MySQL          Usuario Global SQL      nsolignac     -
 33.13[1-4]  *           MongoDB        Mongo PROD              rootAdm       N
 20.111      *           MongoDB        Mongo QA                -             -
-34.135      *           MySQL          Hermes & Hermes Old     nsolignac     N
+34.135      *           MySQL          Hermes & Hermes Old     nsolignac     -
 9.163       esme
 34.118      Veraz       MySQL
 

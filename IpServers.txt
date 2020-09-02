@@ -78,8 +78,12 @@ Server's IP:
 
 
 - Servidores SMPP
-	192.168.33.152 - j1
-	192.168.33.159 - j2
+  192.168.33.115 - lprosndsmpp03
+  192.168.33.126 - lpsndsmpp04
+  192.168.35.156 - haproxysmpp
+  192.168.33.152 - lprosndsmpp01
+  192.168.33.159 - lprosndsmpp02
+  192.168.33.169 - lpsondeossmpp05 (Servidor Aislado)
 
 - Balancer fronterad2
 	192.168.33.80
@@ -251,10 +255,296 @@ Server's IP:
 - Redmine Sondeos PROD - redmine.snd.int
   192.168.33.123
 
+- Stock Lugalu (API)
+  192.168.34.109
+
+- Pilar
+  - Issabel (On Premise)
+    200.85.106.170:4432 - HTTP
+    200.85.106.170:2234 - SSH (root / S0nde0s.P1la4.2020)
 
 
+== LISTA DE SERVIDORES EN WIKI ==
+DNS
+192.168. 9. 20 --> DNSinterno1
+192.168. 9.169 --> DNSinterno2
+192.168.35.125 --> DNSExterno1
+192.168.35.129 --> DNSExterno2
+192.168.33.165 --> DNSManager
 
+VPN
+192.168.35. 37 --> OpenVPN Sondeos
+192.168.35.152 --> OpenVPN PAMI
 
+SMTP
+192.168. 9. 41 --> Mail Relay Centos
+192.168.35.153 --> Mail Relay Nuevo Debian
+
+ASTERISK
+192.168.33.180 --> lpasteriskgwcelulares
+192.168.35.143 --> issabelSoporte
+192.168.33.114 --> freepbxnew --> Central Telefonica Sondeos
+192.168.35.157 --> issabelSoporte --> Central telefonica Soporte
+192.168.35.158 --> lpamiasterisktrunk --> 44.4
+192.168.33.171 --> lpasteriskitplus01 --> Asterisk Saliente CELULARES
+192.168.34.101 --> lpronextast01 --> Nextel Asterisk
+192.168.35.155 --> IssabelPBX
+192.168. 9. 53 --> cpsalesasterisk --> Asterisk Fundacion Sales
+192.168. 9. 67 -- > LNX7 --> Servidor Voipack Sondeos
+192.168. 9.138 --> lpedenorasterisk --> Servidor Asterisk Edenor
+192.168. 9.131 --> lpasteriskd&d --> Drag and Drop Asterisk
+192.168. 9. 57 --> asterisktrunk02 --> Desuso Config solo voipack
+192.168. 9. 32 --> lpnextelviejocelulares ---> INTERNOS PRUEBA CHUTRO 2
+192.168. 9. 60 --> lnx28virt --> lnx28 asterisk Creo IVR1
+
+DOCKER
+192.168.35. 45 --> dockermanagerCI --> ENCTORNO DE PRUEBA CI
+192.168.35. 46 --> dockerworkerci ---> ENTORNO DE PRUEBA CI
+192.168.34. 63 --> dockerglusterfs2
+192.168.34. 60 --> dockermanagement03
+192.168.34. 57 --> dockerworker04
+192.168.34. 51 --> lpdockerprozy02
+192.168.34. 62 --> dockerglusterfs01
+192.168.34. 54 --> dockermachine01
+192.168.34. 55 --> dockermachine02
+192.168.34. 56 --> dockermachine03
+192.168.34. 58 --> dockermanagement01
+192.168.34. 59 --> dockermanagement02
+192.168.34. 67 --> Dockerfslogs
+192.168.34. 50 --> ldockerproxy01
+192.168.35. 56 --> sndregistry
+
+WEB
+192.168.35.131 --> lpwww03 --> Servidor Web Sondeos
+192.168.35.124 --> lpsndproxypass --> Proxy reverso Sondeos
+192.168.35.114 --> lpreceverso2 --> Proxy Reverso 2
+192.168.35.112 --> lrposndwww002 --> Servidor WebSondeos
+192.168. 9.196 --> cpfrontera2worker --> Worker Frontera2
+192.168. 9. 62 --> cpfrontera2worker2 --> 9.62
+192.168. 9. 56 --> Wcprosndhab01 --> Balancer Frontera
+192.168. 9. 39 --> lnx13 --> Viejo servidor Web
+192.168. 9.105 --> wsfrontera2worker3 --> WorkerFrontera2
+192.168. 9. 19 --> wsfrontera2Worker4 --> workerFrontera2
+192.168. 9. 72 --> cprosonhab2 --> BalancerFrontrera2
+192.168. 8. 40 --> lnx25new --> WorkerFronera1
+
+MULTICHANNEL
+192.168.33. 23 --> lpbalancerdbMC01
+192.168.33.187 --> lpmultic --> JAVA
+192.168.33.197 --> lpmultichannelrenaper
+192.168.33. 24 --> lpbalancerdbMC02
+192.168.33.172 --> lpcontacmultichannel
+192.168.33.188 --> lpmultichannelmcbr
+
+SMPP
+192.168.33.115 --> lprosndsmpp03
+192.168.33.126 --> lpsndsmpp04
+192.168.35.156 --> haproxysmpp
+192.168.33.152 --> lprosndsmpp01
+192.168.33.159 --> lprosndsmpp02
+192.168.33.169 --> lpsondeossmpp05
+
+OTROS.
+192.168.34.103 --> WindowsLEXDoctor --> Cliente FULCO
+192.168.34. 65 --> ELKprod --> Servidor de Elastic Search
+192.168.33.163 --> lpactivemq02
+192.168.33.147 --> lpproxyadapter ---> Servidor Proxy del adapter
+192.168.40.101 --> lpsonbr01 --> Sondeos Bridge
+192.168.33.143 --> lprosndgit01 --> Sondeos gitlab
+192.168.33.134 --> lprosndwab02 --> worker 2 del web Adapter
+192.168.33.137 --> lprosndwadha02 --> worker 2 ha del proxy del web Adapter
+192.168.40.102 --> lproutermobiera --> Router para cliente mobiera --servicio de iptables
+192.168.34.109 --> lpstocklugaluapi --> Api para sistema de stock lugalu
+192.168.35.132 --> lptextospeechsondeos --> Servidor de Text to Speech sondeos
+192.168.33.110 --> lpjenkins --> Jenkins Sondeos
+192.168.34.113 --> lproedepr01 --> Edenor Reportes
+192.168.34.102 --> lpronexas01 --> ESME NEXAPOOL
+192.168.34.122 --> lpronexas02 --> ESME NEXAPOOL
+192.168.33.134 --> lprosndwad03
+192.168.33.189 --> lprosndwad03 --> A revisar
+192.168.33.136 --> lprosndwadha01
+192.168.34.139 --> lpxpadmin01 --> Windows MAriela
+192.168.33.15 --> veembackup -> Backup de Equipos Virtuales
+192.168.33.190 --> lpadapter02 --> Adapter cheuquear si esta en uso
+192.168.35.134 --> lpminjus --> servidor del ministerio de Justicia
+192.168.35.35 --> WindowsTecno --> tecno 123 ç
+192.168. 9. 8 --> dpmachine --DIEGO PAEZ EQUIPO
+192.168. 9.137 --> lnx16 --> enrutador
+192.168.33.153 --> lpfsaleswsdb --> base de Datos fundacion Sales
+192.168.35.122 --> lpredminedemo
+192.168.33.113 --> lprorwciproc
+192.168.35.108 --> lprosndntp
+192.168.34.120 --> lproverhaweb02
+192.168.33.130 --> lpzabbixproxy
+192.168.9.84 --> cprosndzb02
+192.168. 9. 92 --> lpscriptingnew -----------------------------------> 190.210.97.2
+192.168.33. 13 --> win10 33.13 soporte
+192.168. 9. 63 --> Bacula Sondeos --> Servidor de Backcup
+192.168. 9. 4 --> btbadm
+192.168. 9. 16 --> cpdokuwiki --> Sondeos Doku Wiki
+192.168. 9. 33 --> cphosting --> Sondeos Hosting Web
+192.168. 9. 12 --> ldap --> servidor ldap sondeos
+192.168. 9. 42 --> lnx2 --> btb file server admin
+192.168. 9. 71 --> lnx56 -->
+192.168. 9. 73 --> lnx73 -->
+192.168. 9. 41 --> lnxmail --> servidor Mail Sondeos
+192.168. 9.214 --> rsyslog --> servidor rsyslog sondeos
+192.168. 9.236 --> lprosonjenkins --> Sondeos Jenkins
+192.168. 9. 82 --> dwh01 --> Windows--> servidor de sql
+192.168. 9. 89 --> lnx72 -->
+192.168. 9. 99 --> lnx81
+192.168. 9. 18 --> lprosones02
+192.168. 9.152 --> lnx102
+192.168. 9.172 --> lnx104
+192.168. 9.181 --> lnx110
+192.168. 9.202 --> rproverfr
+192.168. 9. 22 --> vmware Vcenter Nuevo
+
+QA
+192.168.20.122 --> Virtualizador QA -->
+192.168.20.155 --> DockerQA
+192.168.20.108 --> lqaadapter
+192.168.20.114 --> lqafrontera2
+192.168.20.101 --> lqamultichannel
+192.168.20.105 --> lqaweb
+192.168.20.196 --> webqatesting
+192.168.20. 39 --> dockermanagerqa
+192.168.20. 40 --> dockermanagerqa02
+192.167.20. 41 --> dockerworkerqa01
+192.168.20. 42 --> dockerworkerqa02 -->
+192.168.20. 35 --> lpglusterqa01
+192.168.20. -- > lphaproxyqa
+192.168.20. 36 --> lpglisterqa02
+192.168.20. --> lpmongoqa01
+192.168.20.112 --> lpqactivemq
+192.168.20.103 --> lpqasterisk
+192.168.20.110 --> lpqacmpprocesador
+192.168.20.XX --> lpqamultichanneldemo
+192.168.20.107 --> lpqaproxyreverso
+192.168.20.115 --> lpqatestlink
+192.168.20.109 --> lqawsadapter01
+
+CMP
+192.168.33.142 --> lpasteriskcmp01
+192.168.33.157 --> lpasteriskcmp02
+192.168.33.158 --> lpasteriskcmp03
+192.168.33.175 --> lpasteriskcmp04
+192.168.33.177 --> lpasteriskcmp06
+192.168.33.162 --> lpasteriskcmp07
+192.168.33.182 --> lpasteriskcmp08
+192.168.33.193 --> lpasteriskcmp10
+192.168.33.192 --> lpasteriskcmp09
+192.168.33.117 --> lpsmdcmpjre02 --> Java cmp Procesador
+192.168.33.176 --> lpasteriskcmp05
+192.168.33.194 --> lpasteriskcmp11
+192.168.33.195 --> TrunkPami --> Excmp12
+192.168.33.179 --> lpateriskcmpcel01
+192.168.33.119 --> lpasteriskcmpcel03
+192.168.34.124 --> lprocmpauha01
+192.168.33.148 --> lprosndsctcmp01 --> scripting
+192.168.33.109 --> lpsndjavacmp03 --> Java
+192.168.33.154 --> lpcmpprocesador --> procesador CMP
+192.168.33.146 -- lprosndcmpjre01 --> JAVA CMP
+192.168.35.127 --> lprosndftp02 --> Servidor FTP SONDEOS
+192.168.33.129 --> lprosndmq01 -->
+
+FRONEUS
+192.168.33.167 --> lpasteriskfroneus04
+192.168.33.168 --> lpasteriskfroneus05
+192.168.33.166 --> lpfroneusapp03
+192.168.35.106 --> lpfroneusappqa01
+192.168.35.137 --> froneusmongo
+192.168.35.141 --> lpfroneusapp01
+192.168.35.140 --> lpfroneusasterisk02
+192.168.33.161 --> lproneusasterisk03
+192.168.35.121 --> lpfroneusweb
+192.168.35.102 --> lpfroneusappdev
+192.168.35.139 --> froneusmongo03
+192.168.35.103 --> froneusweb
+192.168.33.183 --> lpfroneusasteriskqa01
+192.168.35.137 --> froneusmongo01
+192.168.35.138 --> froneusmongo02
+
+OPTICOM
+192.168.34.135 --> lopticomhermesdb01
+192.168.34.134 --> lopticomjavahermes01
+192.168.34.160 --> lpvrzrouter1
+192.168. 9.173 --> cpopticommcp5 --> entorno mcp 5 opticom
+192.168. 9. 97 --> cpopticomeesme01 --> servidor Esme opticom
+192.168. 9.237 --> lnx62optbis
+192.168. 9. 75 --> lnx62 -->
+192.168. 9. 90 --> Procesdorpubopticom
+
+Base de datos
+192.168.33. 61 --> lpgaleraha01
+192.168.33. 62 --> lpgaleraha02
+192.168.34.121 --> lprooptcsv01 --> CSV DB
+192.168.34.143 --> lpvrainz01 -->
+192.168. 9.219 --> lnx28db
+192.168.33.160 --> lpopticomdb02
+
+Veraz
+192.168.34.106 --> lproverbal02 --> balancer veraz
+192.168.34.116 --> lproverha01
+192.168.34.105 --> lproverbal01
+192.168.34.112 --> lproverfr1021 --> Worker FR1
+192.168.34.117 --> lproverha02
+192.168.34.104 --> lproverwfw201 ---> Worker FR2
+192.168.34.110 --> lproverwrfr02
+192.168.34.143 --> lpvrainz01
+192.168.34.111 --> lproverfr101 -->
+192.168.34.119 --> lproverha01 -->
+192.168. 9.233 --> Sondeos Vcenter viejo
+192.168.34.136 --> lproverazivr --> Ex 9.169
+192.168. 9. 28 --> cproivrveras --> Asterisk IVR VERAZ
+
+VicenteLopez
+192.168.34.140 --> lpredmineviclopez
+192.168.34.141 --> lpredminevlopez
+192.168.34.127 --> vlopez-redeterminaciones
+192.168.34.144 --> vlopezapivisados
+
+PAMI
+192.168.34.145 --> asternicprodeb9 ---> Servidor de Reportes de Cola
+192.168.34.151 --> IssabelPami
+
+ANDROID
+192.168.33. 91 --> Androidmachine fisica
+192.168.35.158 --> Androidmachine fisica2
+192.168.33. 90 --> AndroidmachineFisica 3
+192.168.35.117 -->lpemuandroid04
+192.168.35.127 --> lpemuandroid07
+192.168.35.142 --> lpemuandroid09
+192.168.35.147 --> lpemuandroid11
+192.168.35.148 --> lpemuandroid12
+192.168.35.118 --> lpemuandroid5
+192.168.35.113 --> lpemunadroid02
+192.168.35.116 --> lproemuandroid03
+192.168.35.150 --> lpemuandroid14
+192.168.35.151 --> lpemuandrpid
+
+DESARROLLO
+Todos los servidores de desarrollo son virtuales 1 se encuentra en el 9.94 (vcenter viejo), y en el 9.127 (vcenter nueva)Edit this section
+Virtualizadores
+192.168.33.155 --> Vcenter viejo Los Patos
+192.168. 9. 94 --> Virtualizador Desarrollo vcenter Viejo Reconquista
+192.168.33.185 --> Virtualizador Froneus Los Patos
+192.168. 9.176 --> Virtualizador Reconquista
+192.168.20.122 --> Virtualizador QA
+192.168.33. 10 --> VIRTUALIZADOR E12 LOS PATOS --> 10.0.23.10
+192.168.33. 11 --> VIRTUALIZADOR E12 LOS PATOS --> 10.0.23.11
+192.168.33. 12 --> VIRTUALIZADOR E12 LOS PATOS --> 10.0.23.12
+192.168.33.124 --> VIRTUALIZADOR LOS PATOS
+192.168.33.127 --> VIRTUALIZADOR LOS PATOS
+192.168. 9.232 --> VIRTUALIZADOR LOS PATOS --> E8
+192.168. 9. 24 --> VIRTUALIZADOR LOS PATOS --> E12
+192.168. 9. 49 --> VIRTUALIZADOR LOS PATOS E9
+192.168. 9. 78 --> VIRTUALIZADOR LOS PATOS --> E9
+192.168. 9. 80 --> VIRTUALIZADOR LOS PATOS --> E9
+192.168. 9. 44 --> VIRTUALIZADOR CEBALLOS
+192.168. 9. 47 --> VIRTUALIZADOR CEBALLOS
+192.168. 9. 55 --> VIRTUALIZADOR CEBALLOS
+192.168. 9.127 --> VIRTUALIZADOR A CHEQUEAR
 
 
 

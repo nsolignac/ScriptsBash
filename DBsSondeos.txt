@@ -16,7 +16,7 @@ CLUSTER GALERA REPORTES
 HA Proxy - http://192.168.33.80/haproxy?stats
 Master  - 192.168.33.40 3306 (Scripts - /dbdata/scripts/)
 Worker 1 - 192.168.33.41 3306
-Worker 2 - 192.168.33.121 3306 (Scripts - /dbdata/scripts/) - OFF
+Worker 2 - 192.168.33.121 3306 (Scripts - /dbdata/scripts/) - OFF ???
 Worker 3 - 192.168.33.120 3306 - OFF
 
 Replica System 10.10.10.10
@@ -62,6 +62,13 @@ Replica 1 (lprosonmo02) - 192.168.33.132 27017
 Replica 2 (lprosonmo03) - 192.168.33.133 27017
 Replica 3 (lprosonmo04) - 192.168.33.101 27017 - (!)OFFLINE
 
+--------
+MONGO QA
+---------
+IP: 192.168.20.111
+DB: cmp
+User: cmpAdm
+Passwd: 3135
 
 ---------------------
 REDMINE VICENTE LOPEZ

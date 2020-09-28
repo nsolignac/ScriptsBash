@@ -182,6 +182,9 @@ Server's IP:
 - DB Mongo Celulares / Scripts / Number-Land / Cron Reporte IVR
   192.168.33.113
 
+- DB Mongo Desa
+  192.168.10.70
+
 - Procesador de audio CMP
   192.168.33.117
 
@@ -302,7 +305,7 @@ DOCKER
 192.168.35. 46 --> dockerworkerci ---> ENTORNO DE PRUEBA CI
 192.168.34. 63 --> dockerglusterfs2
 192.168.34. 60 --> dockermanagement03
-192.168.34. 57 --> dockerworker04
+192.168.34.57 --> dockerworker04
 192.168.34. 51 --> lpdockerprozy02
 192.168.34. 62 --> dockerglusterfs01
 192.168.34. 54 --> dockermachine01
@@ -346,7 +349,7 @@ SMPP
 
 OTROS.
 192.168.34.103 --> WindowsLEXDoctor --> Cliente FULCO
-192.168.34. 65 --> ELKprod --> Servidor de Elastic Search
+192.168.34.65 --> ELKprod --> Servidor de Elastic Search
 192.168.33.163 --> lpactivemq02
 192.168.33.147 --> lpproxyadapter ---> Servidor Proxy del adapter
 192.168.40.101 --> lpsonbr01 --> Sondeos Bridge
@@ -443,7 +446,7 @@ CMP
 192.168.34.124 --> lprocmpauha01
 192.168.33.148 --> lprosndsctcmp01 --> scripting
 192.168.33.109 --> lpsndjavacmp03 --> Java
-192.168.33.154 --> lpcmpprocesador --> procesador CMP
+192.168.33.154 --> lpcmpprocesador --> procesador CMP / Wrapper
 192.168.33.146 -- lprosndcmpjre01 --> JAVA CMP
 192.168.35.127 --> lprosndftp02 --> Servidor FTP SONDEOS
 192.168.33.129 --> lprosndmq01 -->

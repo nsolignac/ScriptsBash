@@ -244,6 +244,9 @@ Server's IP:
 - Servidor OVPN PAMI
   192.168.34.152
 
+- Servidor OVPN Froneus
+  192.168.
+
 - Servidores DNS
   192.168.33.165 - lpsndDNSManager (Master)
   192.168.9.169 - cprosnddn02
@@ -363,7 +366,7 @@ OTROS.
 192.168.34.113 --> lproedepr01 --> Edenor Reportes
 192.168.34.102 --> lpronexas01 --> ESME NEXAPOOL
 192.168.34.122 --> lpronexas02 --> ESME NEXAPOOL
-192.168.33.134 --> lprosndwad03
+192.168.33.134 --> lprosndwad03 -->
 192.168.33.189 --> lprosndwad03 --> A revisar
 192.168.33.136 --> lprosndwadha01
 192.168.34.139 --> lpxpadmin01 --> Windows MAriela

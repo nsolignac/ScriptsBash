@@ -16,7 +16,7 @@ CLUSTER GALERA REPORTES
 HA Proxy - http://192.168.33.80/haproxy?stats
 Master  - 192.168.33.40 3306 (Scripts - /dbdata/scripts/)
 Worker 1 - 192.168.33.41 3306
-Worker 2 - 192.168.33.121 3306 (Scripts - /dbdata/scripts/) - OFF ???
+Worker 2 - 192.168.33.121 3306 (Scripts - /dbdata/scripts/) - OFF ??? (Depura FM Y FR Logs Scripts)
 Worker 3 - 192.168.33.120 3306 - OFF
 
 Replica System 10.10.10.10

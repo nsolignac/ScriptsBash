@@ -351,6 +351,7 @@ SMPP
 192.168.33.169 --> lpsondeossmpp05
 
 OTROS.
+192.168.34.20 --> Logstash Prod
 192.168.34.103 --> WindowsLEXDoctor --> Cliente FULCO
 192.168.34.65 --> ELKprod --> Servidor de Elastic Search
 192.168.33.163 --> lpactivemq02

@@ -283,7 +283,8 @@ VPN
 192.168.35.152 --> OpenVPN PAMI
 
 SMTP
-192.168. 9. 41 --> Mail Relay Centos
+192.168.9.33   --> SMTP Desa? - OFFLINE??
+192.168.9.41   --> Mail Relay Centos - OFFLINE?
 192.168.35.153 --> Mail Relay Nuevo Debian
 
 ASTERISK
@@ -351,6 +352,7 @@ SMPP
 192.168.33.169 --> lpsondeossmpp05
 
 OTROS.
+192.168.34.155 --> Asternic Prod
 192.168.34.20 --> Logstash Prod
 192.168.34.103 --> WindowsLEXDoctor --> Cliente FULCO
 192.168.34.65 --> ELKprod --> Servidor de Elastic Search

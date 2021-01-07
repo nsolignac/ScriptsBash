@@ -1,0 +1,163 @@
+//defino variables a utilizar a lo largo de la pipeline
+def proyecto = "app"
+def imagen ="app-api"
+def puertoHost = "8443"
+def puertoContainer = "8443"
+def mailDesa = "devteam@empresa.com.ar"
+def mailQA = "qa@empresa.com.ar"
+//defino las funciones para notificaciones
+def notifyBuild() {
+    def mailDesa = "devteam@empresa.com.ar"
+    script{
+        mail to: "${mailDesa}",
+                from: 'Jenkins',
+                subject: "${currentBuild.currentResult}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
+                body: "Resultado de build de imagen: ${currentBuild.currentResult}. Ver salida de consola en ${env.BUILD_URL}"
+    }
+}
+def notifyDeployDesa() {
+    def mailDesa = "devteam@empresa.com.ar"
+    script{
+        mail to: "${mailDesa}",
+                from: 'Jenkins',
+                subject: "${currentBuild.currentResult}: ${currentBuild.fullDisplayName}",
+                body: "Resultado de implementación en entorno de desarrollo: ${currentBuild.currentResult}. Ver salida de consola en ${env.BUILD_URL}"
+    }
+}
+def notifyQa() {
+    def mailDesa = "devteam@empresa.com.ar"
+    def mailQA = "qa@empresa.com.ar"
+    script{
+        mail to: "${mailQA}, ${mailDesa}",
+                from: 'Jenkins',
+                subject: "${currentBuild.currentResult}: ${currentBuild.fullDisplayName}",
+                body: "Resultado de implementación en entorno de QA: ${currentBuild.currentResult}. Ver salida de consola en ${env.BUILD_URL}"
+    }
+}
+//genero las funciones para obtener la env.GIT_TAG_NAME
+String gitTagName() {
+    commit = getCommit()
+    if (commit) {
+        desc = sh(script: "git describe --tags ${commit}", returnStdout: true)?.trim()
+        if (isTag(desc)) {
+            return desc
+        }
+    }
+    return null
+}
+String getCommit() {
+    return sh(script: 'git rev-parse HEAD', returnStdout: true)?.trim()
+}
+@NonCPS
+boolean isTag(String desc) {
+    match = desc =~ /.+-[0-9]+-g[0-9A-Fa-f]{6,}$/
+    result = !match
+    match = null // prevent serialisation
+    return result
+}
+node{
+    def app
+    try{
+        stage('Notificar inicio de pipeline'){
+            script{
+                mail from: 'Jenkins',
+                        to: "${mailDesa}",
+                        subject: "INICIO: Tarea en Jenkins ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
+                        body: "INICIO: Tarea ${env.JOB_NAME} [${env.BUILD_NUMBER}]: \
+             Verificar la salida de consola en ${env.BUILD_URL}"
+            }
+        }
+        stage('Clonar repositorio') {
+            //No uso un custom checkout porque la configuración del proyecto está definida para seguir tags
+            checkout scm
+        }
+        stage('Generar tag para imagen de docker'){
+            //genero la env.GIT_TAG_NAME
+            env.GIT_TAG_NAME = gitTagName()
+        }
+        //Aquí comienza el proceso de build y push de la imagen
+        stage('Buildear imagen') {
+            app = docker.build("${proyecto}/${imagen}")
+        }
+
+        stage('Pushear imagen') {
+            //esta información sobre el registry es custom y se utiliza un ID guardado como variable de Jenkins
+            docker.withRegistry('https://registry.empresa.com') {
+                app.push("${env.GIT_TAG_NAME}")
+                //app.push("latest")
+            }
+        }
+        //En Gitlab se notifica el éxito o fallo del build de la imagen, no de todo el pipeline
+        stage('gitlab') {
+            echo 'Notify GitLab'
+            updateGitlabCommitStatus name: 'build', state: 'pending'
+            updateGitlabCommitStatus name: 'build', state: 'success'
+        }
+        notifyBuild()
+    } catch (err) {
+        currentBuild.result = "FAILURE"
+        notifyBuild()
+        throw err
+    }
+}
+//Se procede a deployar en DEV en otro nodo para no bloquear tareas
+def remoteDev = [:]
+remoteDev.name = "dockermgm1"
+remoteDev.host = "127.0.0.1"
+remoteDev.allowAnyHosts = true
+node{
+    try{
+        withCredentials([usernamePassword(credentialsId: 'Docker_Swarm_Manager_DEV', passwordVariable: 'passWord', usernameVariable: 'userName')]){
+            remoteDev.user = userName
+            remoteDev.password = passWord
+            stage('Levantar servicio en Docker Swarm Manager DEV') {
+                //primero le pido que actualice el servicio si ya existe
+                sshCommand remote: remoteDev, command:"docker service update --image registry.empresa.com/${proyecto}/${imagen}:${env.GIT_TAG_NAME} app_app-api || \
+               docker service create --name app_app-api -p ${puertoHost}:${puertoContainer} --replicas 1 registry.empresa.com/${proyecto}/${imagen}:${env.GIT_TAG_NAME}"
+            }
+        }
+        notifyDeployDesa()
+    } catch (err) {
+        currentBuild.result = "FAILURE"
+        notifyBuild()
+        throw err
+    }
+    //Se solicita aprobación manual para deployar en QA con un timeout de 2 días
+    stage('Aprobación manual con mail en QA') {
+        script{
+            timeout(time:2, unit:'DAYS'){
+                mail to: "${mailQA}",
+                        from: 'Jenkins',
+                        subject: "Se requiere aprobación para: ${env.JOB_NAME}",
+                        body: "Se requiere aprobación para proceder con el Deploy de ${env.JOB_NAME} en el Swarm de QA.\nAcceder al siguiente link: ${env.BUILD_URL}input"
+                input message:'¿Aprobar Deploy en QA?'
+            }
+        }
+    }
+    //Si se aprueba, se deploya en QA, si no se aprueba se aborta el pipeline
+}
+def remoteQA = [:]
+remoteQA.name = "lpdockerqamanager1"
+remoteQA.host = "127.0.0.2"
+remoteQA.allowAnyHosts = true
+node{
+    try{
+
+        withCredentials([usernamePassword(credentialsId: 'Docker_Swarm_Manager_SSH', passwordVariable: 'passWord', usernameVariable: 'userName')]){
+
+            remoteQA.user = userName
+            remoteQA.password = passWord
+
+            stage('Levantar servicio en Docker Swarm Manager QA') {
+                sshCommand remote: remoteQA, command:"docker service update --image registry.empresa.com/${proyecto}/${imagen}:${env.GIT_TAG_NAME} app_app-api || \
+                docker service create --name app_app-api -p ${puertoHost}:${puertoContainer} --replicas 1 registry.empresa.com/${proyecto}/${imagen}:${env.GIT_TAG_NAME}"
+            }
+        }
+
+        notifyQa()
+    } catch (err) {
+        currentBuild.result = "FAILURE"
+        notifyBuild()
+        throw err
+    }
+}

@@ -310,6 +310,8 @@ DOCKER
 192.168.34. 63 --> dockerglusterfs2
 192.168.34. 60 --> dockermanagement03
 192.168.34.57 --> dockerworker04
+192.168.34.69 --> dockerworker05
+192.168.34.76 --> dockerworker10
 192.168.34. 51 --> lpdockerprozy02
 192.168.34. 62 --> dockerglusterfs01
 192.168.34. 54 --> dockermachine01

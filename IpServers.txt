@@ -85,7 +85,7 @@ Server's IP:
   192.168.33.159 - lprosndsmpp02
   192.168.33.169 - lpsondeossmpp05 (Servidor Aislado)
 
-- Balancer fronterad2
+- Balancer Galera fronterad2
 	192.168.33.80
 
 
@@ -123,7 +123,7 @@ Server's IP:
   192.168.10.29
 
 - Asterisk CMP
-   9.131 - Asterisk (AGI Entrante)
+  9.131 - Asterisk (AGI Entrante)
   33.142 - Asterisk - 13.14.1 / Push Server
   33.157 - Asterisk - 13.14.1
   33.158 - Asterisk - 13.14.1
@@ -475,6 +475,10 @@ FRONEUS
 192.168.33.183 --> lpfroneusasteriskqa01
 192.168.35.137 --> froneusmongo01
 192.168.35.138 --> froneusmongo02
+192.168.33.45 --> lpbbvaprodapps01 - Kubernetes Froneus Master
+192.168.33.46 --> lpbbvaprodapps02 - Kubernetes Froneus Worker Node1
+192.168.33.47 --> lpbbvaprodapps03 - Kubernetes Froneus Worker Node2
+192.168.33.48 --> lpbbvaprodcicd01 - Servidor Artifactory
 
 OPTICOM
 192.168.34.135 --> lopticomhermesdb01
